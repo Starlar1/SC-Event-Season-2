@@ -352,9 +352,13 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  /* background-image: url('https://i.ibb.co/jPSZTK7N/Grid-Art-20251102-171849001.jpg'); ← ဒီလိုင်းကို ဖျက်ပါ */
-  background-size: 100% 100%;
-  background-position: center;
+
+  /* ✅ Loading GIF ကို GitHub မှာပြဖို့ ဒီလိုထည့်ပါ */
+  background-image: url('./Loading1.gif'); /* ← သင့် GIF နာမည်အတိုင်း */
+  background-size: contain;      /* ပုံအနေနဲ့ အပြည့်မဖြစ်အောင် */
+  background-repeat: no-repeat;  /* ထပ်မပေါ်အောင် */
+  background-position: center;   /* အလယ်မှာပြ */
+
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -2137,7 +2141,11 @@ body {
 </div>
 
 <!-- Splash Screen -->
-<div id="splash-screen">
+<div id="splash-screen" 
+     style="background-image: url('./Loading1.gif');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;">
   <div class="loading-circle"></div>
   <div class="countdown-text" id="countdown-text">Loading...</div>
   <button class="enter-btn" id="enter-btn" style="display:none;">၀င်ရောက်မည်</button>
@@ -4108,296 +4116,154 @@ menuButtons.addEventListener('click', (e) => {
   e.stopPropagation();
 });
 
-// ===== COMPLETE SPLASH SCREEN LOADING SCRIPT =====
+
+// ===== COMPLETE SPLASH SCREEN LOADING SCRIPT (FIXED VERSION) =====
 document.addEventListener('DOMContentLoaded', function() {
-    const splashScreen = document.getElementById('splash-screen');
-    const mainScreen = document.getElementById('main-screen');
-    const countdownText = document.getElementById('countdown-text');
-    const enterBtn = document.getElementById('enter-btn');
-    const bgMusic = document.getElementById('bg-music');
-    const loginScreen = document.getElementById('login-screen');
+  const splashScreen = document.getElementById('splash-screen');
+  const mainScreen = document.getElementById('main-screen');
+  const countdownText = document.getElementById('countdown-text');
+  const enterBtn = document.getElementById('enter-btn');
+  const bgMusic = document.getElementById('bg-music');
+  const loginScreen = document.getElementById('login-screen');
 
-// ✅ CORRECT FILE PATHS FOR GITHUB PAGES (ROOT FOLDER)
-const loadingBackgrounds = [
-    'https://starlar1.github.io/SC-Event-Season-2/Loading%201.gif',
-    'https://starlar1.github.io/SC-Event-Season-2/Loading%202.gif',
-    'https://starlar1.github.io/SC-Event-Season-2/Loading%203.gif',
-    'https://starlar1.github.io/SC-Event-Season-2/Loading%204.gif'
-];
-  
-    // Debug function to check image loading
-    function debugImageLoading() {
-        console.log('=== DEBUG: Checking GIF Loading ===');
-        loadingBackgrounds.forEach((url, index) => {
-            const img = new Image();
-            img.onload = () => console.log(`✅ GIF ${index + 1} loaded: ${url}`);
-            img.onerror = () => console.log(`❌ GIF ${index + 1} failed: ${url}`);
-            img.src = url;
-        });
+  // ✅ CORRECT RAW LINKS (GitHub Pages version)
+  const loadingBackgrounds = [
+    './Loading1.gif',
+    './Loading2.gif',
+    './Loading3.gif',
+    './Loading4.gif'
+  ];
+
+  // ✅ (1) Random Loading GIF ပြဖို့ Function
+  function setRandomLoadingBackground() {
+    if (splashScreen) {
+      const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
+      const randomBackground = loadingBackgrounds[randomIndex];
+      splashScreen.style.backgroundImage = `url('${randomBackground}')`;
+      splashScreen.style.backgroundSize = 'contain';
+      splashScreen.style.backgroundRepeat = 'no-repeat';
+      splashScreen.style.backgroundPosition = 'center';
+      console.log('🎨 Using loading GIF:', randomBackground);
     }
+  }
 
-    // Function to set random loading background from GitHub
-    function setRandomLoadingBackground() {
-        if (splashScreen) {
-            const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
-            const randomBackground = loadingBackgrounds[randomIndex];
-            
-            console.log('Setting loading background:', randomBackground);
-            
-            // Create test image to verify loading
-            const testImg = new Image();
-            testImg.onload = function() {
-                console.log('✅ Background GIF loaded successfully');
-                splashScreen.style.backgroundImage = `url('${randomBackground}')`;
-            };
-            testImg.onerror = function() {
-                console.log('❌ Background GIF failed to load, using fallback');
-                // Fallback to solid color if GIF fails
-                splashScreen.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            };
-            testImg.src = randomBackground;
+  // Preload all loading GIFs (optional for performance)
+  function preloadLoadingGifs() {
+    loadingBackgrounds.forEach(url => {
+      const img = new Image();
+      img.src = url;
+    });
+  }
+
+  // Check if user is logged in
+  function checkUserLogin() {
+    const savedUser = localStorage.getItem('currentUser');
+    return savedUser ? JSON.parse(savedUser) : null;
+  }
+
+  // ✅ (2) Splash initialization
+  function initializeSplashScreen() {
+    console.log('=== Initializing Splash Screen ===');
+
+    // hide other screens
+    if (mainScreen) mainScreen.style.display = 'none';
+    if (loginScreen) loginScreen.style.display = 'none';
+
+    // show splash + random gif
+    if (splashScreen) splashScreen.style.display = 'flex';
+    setRandomLoadingBackground();
+    preloadLoadingGifs();
+
+    // loading animation
+    simulateLoadingProcess();
+  }
+
+  // fake loading progress bar
+  function simulateLoadingProcess() {
+    let progress = 0;
+    const loadingInterval = setInterval(() => {
+      progress += Math.random() * 15;
+      if (countdownText)
+        countdownText.textContent = `Loading... ${Math.min(100, Math.round(progress))}%`;
+
+      if (progress >= 100) {
+        clearInterval(loadingInterval);
+        showEnterButton();
+      }
+    }, 300);
+  }
+
+  // show button after loading
+  function showEnterButton() {
+    if (countdownText) countdownText.style.display = 'none';
+    if (enterBtn) {
+      enterBtn.style.display = 'block';
+      enterBtn.style.animation = 'fadeIn 0.5s ease-in';
+    }
+  }
+
+  // ✅ (3) Button click → only then hide splash + show home/login
+  function setupEnterButton() {
+    if (!enterBtn) return;
+    enterBtn.addEventListener('click', function() {
+      const user = checkUserLogin();
+
+      splashScreen.style.transition = 'opacity 1s ease';
+      splashScreen.style.opacity = '0';
+
+      setTimeout(() => {
+        splashScreen.style.display = 'none';
+
+        if (user) {
+          if (mainScreen) mainScreen.style.display = 'block';
+        } else {
+          if (loginScreen) loginScreen.style.display = 'flex';
         }
-    }
 
-    // Preload all loading GIFs for faster switching
-    function preloadLoadingGifs() {
-        let loadedCount = 0;
-        loadingBackgrounds.forEach(url => {
-            const img = new Image();
-            img.onload = () => {
-                loadedCount++;
-                console.log(`✅ Preloaded: ${url}`);
-                if (loadedCount === loadingBackgrounds.length) {
-                    console.log('🎉 All GIFs preloaded successfully!');
-                }
-            };
-            img.onerror = () => {
-                console.log(`❌ Failed to preload: ${url}`);
-            };
-            img.src = url;
-        });
-    }
+        playBackgroundMusic();
+      }, 1000);
+    });
+  }
 
-    // Check if user is logged in
-    function checkUserLogin() {
-        const savedUser = localStorage.getItem('currentUser');
-        return savedUser ? JSON.parse(savedUser) : null;
-    }
+  // play bgm
+  function playBackgroundMusic() {
+    if (!bgMusic) return;
+    bgMusic.volume = 0.7;
+    bgMusic.play().catch(() => {
+      document.addEventListener('click', function play() {
+        bgMusic.play();
+        document.removeEventListener('click', play);
+      });
+    });
+  }
 
-    // Initialize splash screen
-    function initializeSplashScreen() {
-        console.log('=== Initializing Splash Screen ===');
-        
-        // Debug image loading first
-        debugImageLoading();
-        
-        // Set random loading background
-        setRandomLoadingBackground();
-        
-        // Preload all GIFs
-        preloadLoadingGifs();
-        
-        // Hide other screens
-        if (mainScreen) {
-            mainScreen.style.display = 'none';
-        }
-        
-        if (loginScreen) {
-            loginScreen.style.display = 'none';
-        }
+  // CSS animation styles
+  function addCustomStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      #splash-screen { transition: opacity 0.5s ease; }
+      .enter-btn { transition: all 0.3s ease; }
+    `;
+    document.head.appendChild(style);
+  }
 
-        // Show loading text
-        if (countdownText) {
-            countdownText.textContent = "Loading...";
-        }
+  function init() {
+    addCustomStyles();
+    initializeSplashScreen();
+    setupEnterButton();
+  }
 
-        // Simulate loading process
-        simulateLoadingProcess();
-    }
-
-    // Simulate loading process with progress
-    function simulateLoadingProcess() {
-        let progress = 0;
-        const loadingInterval = setInterval(() => {
-            progress += Math.random() * 15;
-            
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(loadingInterval);
-                
-                // Loading complete - show enter button
-                showEnterButton();
-            }
-            
-            // Update loading text with progress
-            if (countdownText) {
-                countdownText.textContent = `Loading... ${Math.min(100, Math.round(progress))}%`;
-            }
-            
-        }, 300);
-    }
-
-    // Show enter button when loading complete
-    function showEnterButton() {
-        if (countdownText) {
-            countdownText.style.display = 'none';
-        }
-        if (enterBtn) {
-            enterBtn.style.display = 'block';
-            enterBtn.style.animation = 'fadeIn 0.5s ease-in';
-        }
-        
-        // Add button animation
-        addButtonAnimation();
-    }
-
-    // Add button hover and click animations
-    function addButtonAnimation() {
-        if (enterBtn) {
-            enterBtn.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.05)';
-                this.style.boxShadow = '0 6px 20px rgba(0, 153, 255, 0.6)';
-            });
-            
-            enterBtn.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1)';
-                this.style.boxShadow = '0 4px 12px rgba(0, 153, 255, 0.4)';
-            });
-            
-            enterBtn.addEventListener('mousedown', function() {
-                this.style.transform = 'scale(0.95)';
-            });
-            
-            enterBtn.addEventListener('mouseup', function() {
-                this.style.transform = 'scale(1.05)';
-            });
-        }
-    }
-
-    // Enter Button Click Handler
-    function setupEnterButton() {
-        if (enterBtn) {
-            enterBtn.addEventListener('click', function() {
-                // Add click animation
-                this.style.animation = 'pulse 0.3s ease';
-                
-                // Check user login status
-                const user = checkUserLogin();
-                
-                setTimeout(() => {
-                    // Hide splash screen
-                    if (splashScreen) {
-                        splashScreen.style.opacity = '0';
-                        splashScreen.style.transition = 'opacity 0.5s ease';
-                    }
-
-                    setTimeout(() => {
-                        if (splashScreen) {
-                            splashScreen.style.display = 'none';
-                        }
-
-                        if (user) {
-                            // User exists - show main screen directly
-                            if (mainScreen) {
-                                mainScreen.style.display = 'block';
-                                mainScreen.style.opacity = '0';
-                                mainScreen.style.animation = 'fadeIn 0.5s ease forwards';
-                            }
-                        } else {
-                            // No user - show login screen
-                            if (loginScreen) {
-                                loginScreen.style.display = 'flex';
-                                loginScreen.style.opacity = '0';
-                                loginScreen.style.animation = 'fadeIn 0.5s ease forwards';
-                            }
-                        }
-
-                        // Play background music
-                        playBackgroundMusic();
-
-                    }, 500);
-                }, 300);
-            });
-        }
-    }
-
-    // Play background music
-    function playBackgroundMusic() {
-        if (bgMusic) {
-            const playMusic = () => {
-                bgMusic.volume = 0.7;
-                bgMusic.play().then(() => {
-                    console.log('Background music started');
-                }).catch(e => {
-                    console.log('Audio play failed:', e);
-                });
-            };
-
-            // Try to play immediately
-            playMusic();
-
-            // Also allow user to interact to play
-            document.addEventListener('click', function playOnClick() {
-                playMusic();
-                document.removeEventListener('click', playOnClick);
-            }, { once: true });
-        }
-    }
-
-    // Add CSS animations
-    function addCustomStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(20px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-            
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
-            }
-            
-            .enter-btn {
-                animation: fadeIn 0.5s ease;
-                transition: all 0.3s ease;
-            }
-            
-            #splash-screen {
-                transition: opacity 0.5s ease;
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-            }
-            
-            #main-screen {
-                animation: fadeIn 0.5s ease;
-            }
-            
-            #login-screen {
-                animation: fadeIn 0.5s ease;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // Initialize everything
-    function init() {
-        console.log('🚀 Starting Splash Screen System...');
-        addCustomStyles();
-        initializeSplashScreen();
-        setupEnterButton();
-        
-        // Auto debug after 3 seconds
-        setTimeout(() => {
-            debugImageLoading();
-        }, 3000);
-    }
-
-    // Start the splash screen system
-    init();
+  init();
 });
+
+    
+
+
+  
 // ===== SUPABASE CONFIGURATION (FOUR SERVERS WITH 300 USER LIMIT EACH) =====
 const SUPABASE_SERVERS = {
   server1: {
