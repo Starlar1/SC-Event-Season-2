@@ -4117,14 +4117,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const bgMusic = document.getElementById('bg-music');
     const loginScreen = document.getElementById('login-screen');
 
-    // ✅ CORRECT GitHub Loading GIFs URLs
-    const loadingBackgrounds = [
-        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%201.gif',
-        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%202.gif', 
-        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%203.gif',
-        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%204.gif'
-    ];
-
+// ✅ CORRECT FILE PATHS FOR GITHUB PAGES (ROOT FOLDER)
+const loadingBackgrounds = [
+    'https://starlar1.github.io/SC-Event-Season-2/Loading%201.gif',
+    'https://starlar1.github.io/SC-Event-Season-2/Loading%202.gif',
+    'https://starlar1.github.io/SC-Event-Season-2/Loading%203.gif',
+    'https://starlar1.github.io/SC-Event-Season-2/Loading%204.gif'
+];
+  
     // Debug function to check image loading
     function debugImageLoading() {
         console.log('=== DEBUG: Checking GIF Loading ===');
