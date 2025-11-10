@@ -4113,7 +4113,7 @@ menuButtons.addEventListener('click', (e) => {
 
 
     
-// ===== COMPLETE SPLASH SCREEN LOADING SCRIPT (FIXED VERSION) =====
+// ===== COMPLETE SPLASH SCREEN LOADING SCRIPT (FULL SCREEN VERSION) =====
 document.addEventListener('DOMContentLoaded', function() {
   const splashScreen = document.getElementById('splash-screen');
   const mainScreen = document.getElementById('main-screen');
@@ -4122,105 +4122,85 @@ document.addEventListener('DOMContentLoaded', function() {
   const bgMusic = document.getElementById('bg-music');
   const loginScreen = document.getElementById('login-screen');
 
+  // ✅ LOADING GIF LINKS
+  const loadingBackgrounds = [
+    './Loading1.gif',
+    './Loading2.gif',
+    './Loading3.gif',
+    './Loading4.gif'
+  ];
 
-
-// Preload all loading GIFs (optional for performance)
-function preloadLoadingGifs() {
-  loadingBackgrounds.forEach(url => {
-    const img = new Image();
-    img.onload = function() {
-      console.log('✅ Preloaded:', url);
-    };
-    img.onerror = function() {
-      console.log('❌ Failed to preload:', url);
-    };
-    img.src = url;
-  });
-  }
-
-  // Check if user is logged in
-  function checkUserLogin() {
-    const savedUser = localStorage.getItem('currentUser');
-    return savedUser ? JSON.pa// ✅ CORRECT RAW LINKS (GitHub Pages version)
-const loadingBackgrounds = [
-  './Loading1.gif',
-  './Loading2.gif',
-  './Loading3.gif',
-  './Loading4.gif'
-];
-
-// ✅ (1) Random Loading GIF ပြဖို့ Function - FULL SCREEN VERSION
-function setRandomLoadingBackground() {
-  if (splashScreen) {
+  // ✅ FULL SCREEN GIF FUNCTION
+  function setFullScreenLoadingGif() {
+    if (!splashScreen) return;
+    
     const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
     const randomBackground = loadingBackgrounds[randomIndex];
     
-    // အရင်ဆုံး Blue Screen ထားမယ်
-    splashScreen.style.backgroundColor = '#0000ff';
-    splashScreen.style.backgroundImage = 'none';
-    
-    // GIF ကိုထည့်မယ်
-    const img = new Image();
-    img.onload = function() {
-      // GIF ပေါ်ရင် FULL SCREEN ပြမယ်
-      splashScreen.style.backgroundImage = `url('${randomBackground}')`;
-      splashScreen.style.backgroundSize = '120% auto'; /* နည်းနည်းလေးကြီးအောင် */
-      splashScreen.style.backgroundPosition = 'center 30%'; /* အပေါ်ကိုနည်းနည်းတင်မယ် */
-      splashScreen.style.backgroundRepeat = 'no-repeat';
-      splashScreen.style.backgroundColor = '#0000ff'; /* Blue background ဆက်ထားမယ် */
-      console.log('🎨 Using FULL SCREEN loading GIF:', randomBackground);
-    };
-    
-    img.onerror = function() {
-      // GIF မပေါ်ရင် Blue Screen ပဲဆက်ပြမယ်
-      splashScreen.style.backgroundImage = 'none';
-      splashScreen.style.backgroundColor = '#0000ff';
-      console.log('❌ Loading GIF failed, using blue screen only');
-    };
-    
-    img.src = randomBackground;
-  }
-  }
-    
-
-// ✅ (2) Splash initialization - UPDATED FOR FULL SCREEN
-function initializeSplashScreen() {
-  console.log('=== Initializing Splash Screen ===');
-
-  // hide other screens
-  if (mainScreen) mainScreen.style.display = 'none';
-  if (loginScreen) loginScreen.style.display = 'none';
-
-  // show splash with blue background
-  if (splashScreen) {
-    splashScreen.style.display = 'flex';
-    // Blue Screen ကို default အနေနဲ့ထားမယ်
-    splashScreen.style.backgroundColor = '#0000ff';
-    splashScreen.style.backgroundImage = 'none';
-    
-    // ရှိပြီးသား GIF element တွေကိုရှင်းမယ်
+    // Clear existing GIF
     const existingGif = splashScreen.querySelector('.fullscreen-gif');
     if (existingGif) {
       existingGif.remove();
     }
-  }
-  
-  preloadLoadingGifs();
-  setRandomLoadingBackground(); // FULL SCREEN GIF ပြမယ်
-  simulateLoadingProcess();
+    
+    // Set blue background first
+    splashScreen.style.backgroundColor = '#0000ff';
+    splashScreen.style.backgroundImage = 'none';
+    
+    // Create full screen GIF element
+    const gifElement = document.createElement('img');
+    gifElement.className = 'fullscreen-gif';
+    gifElement.src = randomBackground;
+    
+    // Style for full screen display
+    gifElement.style.position = 'absolute';
+    gifElement.style.top = '5%'; // အပေါ်ကိုတင်မယ်
+    gifElement.style.left = '0';
+    gifElement.style.width = '100%';
+    gifElement.style.height = '75%'; // 75% height ယူမယ်
+    gifElement.style.objectFit = 'cover'; // Full cover
+    gifElement.style.objectPosition = 'center top'; // အပေါ်ကိုညှိမယ်
+    gifElement.style.zIndex = '9998';
+    gifElement.style.maxWidth = 'none';
+    gifElement.style.maxHeight = 'none';
+    
+    gifElement.onload = function() {
+      console.log('✅ FULL SCREEN GIF loaded:', randomBackground);
+    };
+    
+    gifElement.onerror = function() {
+      console.log('❌ GIF failed to load, using blue screen only');
+      gifElement.remove();
+    };
+    
+    splashScreen.appendChild(gifElement);
   }
 
-    // loading animation
-    simulateLoadingProcess();
+  // ✅ PRELOAD FUNCTION
+  function preloadLoadingGifs() {
+    console.log('🔄 Preloading GIFs...');
+    
+    loadingBackgrounds.forEach(url => {
+      const img = new Image();
+      img.onload = function() {
+        console.log('✅ Preloaded:', url);
+      };
+      img.onerror = function() {
+        console.log('❌ Failed to preload:', url);
+      };
+      img.src = url;
+    });
   }
 
-  // fake loading progress bar
+  // ✅ LOADING PROGRESS SIMULATION
   function simulateLoadingProcess() {
     let progress = 0;
     const loadingInterval = setInterval(() => {
       progress += Math.random() * 15;
-      if (countdownText)
+      if (countdownText) {
         countdownText.textContent = `Loading... ${Math.min(100, Math.round(progress))}%`;
+        countdownText.style.display = 'block';
+      }
 
       if (progress >= 100) {
         clearInterval(loadingInterval);
@@ -4229,73 +4209,302 @@ function initializeSplashScreen() {
     }, 300);
   }
 
-  // show button after loading
+  // ✅ SHOW ENTER BUTTON
   function showEnterButton() {
-    if (countdownText) countdownText.style.display = 'none';
+    if (countdownText) {
+      countdownText.style.display = 'none';
+    }
+    
     if (enterBtn) {
       enterBtn.style.display = 'block';
-      enterBtn.style.animation = 'fadeIn 0.5s ease-in';
+      enterBtn.style.animation = 'fadeInUp 0.8s ease-out';
+      
+      // Add hover effects
+      enterBtn.addEventListener('mouseover', function() {
+        this.style.transform = 'translateY(-3px) scale(1.05)';
+        this.style.boxShadow = '0 8px 25px rgba(255,255,255,0.8)';
+      });
+      
+      enterBtn.addEventListener('mouseout', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+        this.style.boxShadow = '0 6px 20px rgba(255,255,255,0.6)';
+      });
     }
   }
 
-  // ✅ (3) Button click → only then hide splash + show home/login
+  // ✅ CHECK USER LOGIN STATUS
+  function checkUserLogin() {
+    const savedUser = localStorage.getItem('currentUser');
+    return savedUser ? JSON.parse(savedUser) : null;
+  }
+
+  // ✅ INITIALIZE SPLASH SCREEN
+  function initializeSplashScreen() {
+    console.log('=== Initializing Full Screen Splash ===');
+
+    // Hide other screens
+    if (mainScreen) mainScreen.style.display = 'none';
+    if (loginScreen) loginScreen.style.display = 'none';
+
+    // Show splash with full screen setup
+    if (splashScreen) {
+      splashScreen.style.display = 'flex';
+      
+      // Set full screen styles
+      splashScreen.style.position = 'fixed';
+      splashScreen.style.top = '0';
+      splashScreen.style.left = '0';
+      splashScreen.style.width = '100vw';
+      splashScreen.style.height = '100vh';
+      splashScreen.style.backgroundColor = '#0000ff';
+      splashScreen.style.backgroundImage = 'none';
+      splashScreen.style.overflow = 'hidden';
+      splashScreen.style.zIndex = '9999';
+      
+      // Clear any existing GIF
+      const existingGif = splashScreen.querySelector('.fullscreen-gif');
+      if (existingGif) {
+        existingGif.remove();
+      }
+    }
+
+    // Start loading process
+    preloadLoadingGifs();
+    setFullScreenLoadingGif();
+    simulateLoadingProcess();
+    
+    console.log('✅ Full Screen Splash Initialized');
+  }
+
+  // ✅ ENTER BUTTON CLICK HANDLER
   function setupEnterButton() {
     if (!enterBtn) return;
+    
     enterBtn.addEventListener('click', function() {
       const user = checkUserLogin();
-
-      splashScreen.style.transition = 'opacity 1s ease';
+      
+      // Add click animation
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = 'scale(1)';
+      }, 150);
+      
+      // Fade out splash screen
+      splashScreen.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
       splashScreen.style.opacity = '0';
-
+      splashScreen.style.transform = 'scale(1.1)';
+      
       setTimeout(() => {
         splashScreen.style.display = 'none';
-
+        
+        // Show appropriate screen based on login status
         if (user) {
-          if (mainScreen) mainScreen.style.display = 'block';
+          if (mainScreen) {
+            mainScreen.style.display = 'block';
+            mainScreen.style.animation = 'fadeIn 0.8s ease';
+          }
         } else {
-          if (loginScreen) loginScreen.style.display = 'flex';
+          if (loginScreen) {
+            loginScreen.style.display = 'flex';
+            loginScreen.style.animation = 'fadeIn 0.8s ease';
+          }
         }
-
+        
         playBackgroundMusic();
-      }, 1000);
+      }, 800);
     });
   }
 
-  // play bgm
+  // ✅ BACKGROUND MUSIC
   function playBackgroundMusic() {
     if (!bgMusic) return;
+    
     bgMusic.volume = 0.7;
-    bgMusic.play().catch(() => {
-      document.addEventListener('click', function play() {
+    
+    // Try to play immediately
+    bgMusic.play().catch(error => {
+      console.log('🔇 Auto-play blocked, waiting for user interaction');
+      
+      // Play on any user interaction
+      const playOnInteraction = function() {
         bgMusic.play();
-        document.removeEventListener('click', play);
-      });
+        document.removeEventListener('click', playOnInteraction);
+        document.removeEventListener('touchstart', playOnInteraction);
+      };
+      
+      document.addEventListener('click', playOnInteraction);
+      document.addEventListener('touchstart', playOnInteraction);
     });
   }
 
-  // CSS animation styles
+  // ✅ ADD CUSTOM ANIMATION STYLES
   function addCustomStyles() {
     const style = document.createElement('style');
     style.textContent = `
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      #splash-screen { transition: opacity 0.5s ease; }
-      .enter-btn { transition: all 0.3s ease; }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      
+      /* Full Screen GIF Styles */
+      .fullscreen-gif {
+        position: absolute !important;
+        top: 5% !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 75% !important;
+        object-fit: cover !important;
+        object-position: center top !important;
+        z-index: 9998 !important;
+        max-width: none !important;
+        max-height: none !important;
+      }
+      
+      /* Splash Screen Base Styles */
+      #splash-screen {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background-color: #0000ff !important;
+        background-image: none !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        padding-bottom: 60px !important;
+        z-index: 9999 !important;
+        overflow: hidden !important;
+        transition: all 0.8s ease !important;
+      }
+      
+      /* Loading Circle - Bigger and More Visible */
+      .loading-circle {
+        width: 70px !important;
+        height: 70px !important;
+        border-radius: 50% !important;
+        border: 6px solid transparent !important;
+        border-top: 6px solid #ffffff !important;
+        border-right: 6px solid #ffffff !important;
+        border-left: 6px solid #ffffff !important;
+        border-bottom: 6px solid #ffffff !important;
+        animation: spin 1.2s linear infinite !important;
+        margin-bottom: 25px !important;
+        z-index: 10000 !important;
+        background: rgba(255,255,255,0.3) !important;
+        box-shadow: 0 0 20px rgba(255,255,255,0.7) !important;
+        backdrop-filter: blur(10px) !important;
+      }
+      
+      /* Enter Button - More Prominent */
+      .enter-btn {
+        margin-top: 25px !important;
+        padding: 12px 30px !important;
+        font-size: 18px !important;
+        background: linear-gradient(145deg, #ffffff, #d9d9d9) !important;
+        color: #0000ff !important;
+        border: none !important;
+        border-radius: 12px !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 6px 20px rgba(255,255,255,0.6) !important;
+        z-index: 10000 !important;
+        font-weight: bold !important;
+        border: 3px solid #ffffff !important;
+        min-width: 140px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        display: none !important;
+      }
+      
+      .enter-btn:hover {
+        transform: translateY(-3px) scale(1.05) !important;
+        box-shadow: 0 8px 25px rgba(255,255,255,0.8) !important;
+        background: linear-gradient(145deg, #ffffff, #ffffff) !important;
+      }
+      
+      /* Countdown Text - More Visible */
+      .countdown-text {
+        color: #ffffff !important;
+        font-size: 18px !important;
+        margin-top: 15px !important;
+        z-index: 10000 !important;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.8) !important;
+        background: rgba(0,0,0,0.5) !important;
+        padding: 10px 20px !important;
+        border-radius: 10px !important;
+        font-weight: bold !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        display: none !important;
+      }
+      
+      /* Spin Animation */
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
     `;
     document.head.appendChild(style);
   }
 
-  function init() {
-    addCustomStyles();
-    initializeSplashScreen();
-    setupEnterButton();
+  // ✅ ERROR HANDLING
+  function setupErrorHandling() {
+    window.addEventListener('error', function(e) {
+      console.error('❌ Global error:', e.error);
+    });
+    
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('❌ Unhandled promise rejection:', e.reason);
+    });
   }
 
+  // ✅ MAIN INITIALIZATION FUNCTION
+  function init() {
+    console.log('🚀 Starting Full Screen Loading System...');
+    
+    // Add custom styles first
+    addCustomStyles();
+    
+    // Setup error handling
+    setupErrorHandling();
+    
+    // Initialize splash screen
+    initializeSplashScreen();
+    
+    // Setup enter button
+    setupEnterButton();
+    
+    console.log('✅ Full Screen Loading System Ready');
+  }
+
+  // ✅ START THE APPLICATION
   init();
 });
-    
+
+
+
+  
+  
 
 
 
