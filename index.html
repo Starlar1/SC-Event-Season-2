@@ -346,26 +346,7 @@
   pointer-events: none;
 }
 
-#splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
 
-  /* ✅ Loading GIF ကို GitHub မှာပြဖို့ ဒီလိုထည့်ပါ */
-  background-image: url('./Loading1.gif'); /* ← သင့် GIF နာမည်အတိုင်း */
-  background-size: contain;      /* ပုံအနေနဲ့ အပြည့်မဖြစ်အောင် */
-  background-repeat: no-repeat;  /* ထပ်မပေါ်အောင် */
-  background-position: center;   /* အလယ်မှာပြ */
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  padding-bottom: 80px;
-  z-index: 9999;
-}
 
 /* လည်နေသော အဝိုင်း (သေး version) */
 .loading-circle {
@@ -383,7 +364,23 @@
 
 /* လည်ပတ် Animation */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
+  0% { transform: rotate(0deg)#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Loading GIF မပေါ်သေးရင် Blue Background ပေါ်မယ် */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 80px;
+  z-index: 9999;
+  }; }
   100% { transform: rotate(360deg); }
 }
 
