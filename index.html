@@ -346,23 +346,7 @@
   pointer-events: none;
 }
 
-#splash-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-size: cover; /* ဒီလိုင်းကိုပြောင်းလိုက်ပါ */
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-  padding-bottom: 80px;
-  z-index: 9999;
-  background-color: #0000ff; /* Blue Screen အတွက် */
-  }
+
 
 /* လည်နေသော အဝိုင်း (သေး version) */
 .loading-circle {
@@ -374,7 +358,25 @@
   border-right: 4px solid skyblue;
   border-left: 4px solid lightblue;
   border-bottom: 4px solid white;
-  animation: spin 1.2s linear infinite;
+ #splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: 120% auto; /* နည်းနည်းလေးကြီးအောင် */
+  background-position: center 30%; /* အပေါ်ကိုနည်းနည်းတင်မယ် */
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 60px; /* နည်းနည်းလေးတင်မယ် */
+  z-index: 9999;
+  background-color: #0000ff; /* Blue Screen Background */
+  overflow: hidden;
+}
+ animation: spin 1.2s linear infinite;
   margin-bottom: 15px;
 }
 
@@ -4120,41 +4122,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const bgMusic = document.getElementById('bg-music');
   const loginScreen = document.getElementById('login-screen');
 
-// ✅ CORRECT RAW LINKS (GitHub Pages version)
-const loadingBackgrounds = [
-  './Loading1.gif',
-  './Loading2.gif',
-  './Loading3.gif',
-  './Loading4.gif'
-];
 
-// ✅ (1) Random Loading GIF ပြဖို့ Function
-function setRandomLoadingBackground() {
-  if (splashScreen) {
-    const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
-    const randomBackground = loadingBackgrounds[randomIndex];
-    
-    // ပုံမပေါ်သေးရင် Blue Screen ပြမယ်
-    const img = new Image();
-    img.onload = function() {
-      // ပုံပေါ်ရင် GIF ကိုသုံးမယ်
-      splashScreen.style.backgroundImage = `url('${randomBackground}')`;
-      splashScreen.style.backgroundSize = 'cover'; /* ဒီလိုင်းကိုပြောင်းလိုက်ပါ */
-      splashScreen.style.backgroundRepeat = 'no-repeat';
-      splashScreen.style.backgroundPosition = 'center';
-      console.log('🎨 Using loading GIF:', randomBackground);
-    };
-    
-    img.onerror = function() {
-      // ပုံမပေါ်ရင် Blue Screen ပြမယ်
-      splashScreen.style.backgroundImage = 'none';
-      splashScreen.style.backgroundColor = '#0000ff'; /* Blue Screen */
-      console.log('❌ Loading GIF failed, using blue screen');
-    };
-    
-    img.src = randomBackground;
-  }
-  }
 
 // Preload all loading GIFs (optional for performance)
 function preloadLoadingGifs() {
@@ -4173,10 +4141,49 @@ function preloadLoadingGifs() {
   // Check if user is logged in
   function checkUserLogin() {
     const savedUser = localStorage.getItem('currentUser');
-    return savedUser ? JSON.parse(savedUser) : null;
-  }
+    return savedUser ? JSON.pa// ✅ CORRECT RAW LINKS (GitHub Pages version)
+const loadingBackgrounds = [
+  './Loading1.gif',
+  './Loading2.gif',
+  './Loading3.gif',
+  './Loading4.gif'
+];
 
-// ✅ (2) Splash initialization
+// ✅ (1) Random Loading GIF ပြဖို့ Function - FULL SCREEN VERSION
+function setRandomLoadingBackground() {
+  if (splashScreen) {
+    const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
+    const randomBackground = loadingBackgrounds[randomIndex];
+    
+    // အရင်ဆုံး Blue Screen ထားမယ်
+    splashScreen.style.backgroundColor = '#0000ff';
+    splashScreen.style.backgroundImage = 'none';
+    
+    // GIF ကိုထည့်မယ်
+    const img = new Image();
+    img.onload = function() {
+      // GIF ပေါ်ရင် FULL SCREEN ပြမယ်
+      splashScreen.style.backgroundImage = `url('${randomBackground}')`;
+      splashScreen.style.backgroundSize = '120% auto'; /* နည်းနည်းလေးကြီးအောင် */
+      splashScreen.style.backgroundPosition = 'center 30%'; /* အပေါ်ကိုနည်းနည်းတင်မယ် */
+      splashScreen.style.backgroundRepeat = 'no-repeat';
+      splashScreen.style.backgroundColor = '#0000ff'; /* Blue background ဆက်ထားမယ် */
+      console.log('🎨 Using FULL SCREEN loading GIF:', randomBackground);
+    };
+    
+    img.onerror = function() {
+      // GIF မပေါ်ရင် Blue Screen ပဲဆက်ပြမယ်
+      splashScreen.style.backgroundImage = 'none';
+      splashScreen.style.backgroundColor = '#0000ff';
+      console.log('❌ Loading GIF failed, using blue screen only');
+    };
+    
+    img.src = randomBackground;
+  }
+  }
+    
+
+// ✅ (2) Splash initialization - UPDATED FOR FULL SCREEN
 function initializeSplashScreen() {
   console.log('=== Initializing Splash Screen ===');
 
@@ -4184,16 +4191,22 @@ function initializeSplashScreen() {
   if (mainScreen) mainScreen.style.display = 'none';
   if (loginScreen) loginScreen.style.display = 'none';
 
-  // show splash + random gif
+  // show splash with blue background
   if (splashScreen) {
     splashScreen.style.display = 'flex';
     // Blue Screen ကို default အနေနဲ့ထားမယ်
     splashScreen.style.backgroundColor = '#0000ff';
     splashScreen.style.backgroundImage = 'none';
+    
+    // ရှိပြီးသား GIF element တွေကိုရှင်းမယ်
+    const existingGif = splashScreen.querySelector('.fullscreen-gif');
+    if (existingGif) {
+      existingGif.remove();
+    }
   }
   
   preloadLoadingGifs();
-  setRandomLoadingBackground();
+  setRandomLoadingBackground(); // FULL SCREEN GIF ပြမယ်
   simulateLoadingProcess();
   }
 
