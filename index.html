@@ -4113,168 +4113,401 @@ menuButtons.addEventListener('click', (e) => {
 });
 
 
-// ===== COMPLETE SPLASH SCREEN LOADING SCRIPT (FIXED VERSION) =====
+
+// ===== COMPLETE FULLSCREEN LOADING SCRIPT =====
 document.addEventListener('DOMContentLoaded', function() {
-  const splashScreen = document.getElementById('splash-screen');
-  const mainScreen = document.getElementById('main-screen');
-  const countdownText = document.getElementById('countdown-text');
-  const enterBtn = document.getElementById('enter-btn');
-  const bgMusic = document.getElementById('bg-music');
-  const loginScreen = document.getElementById('login-screen');
+    const splashScreen = document.getElementById('splash-screen');
+    const mainScreen = document.getElementById('main-screen');
+    const countdownText = document.getElementById('countdown-text');
+    const enterBtn = document.getElementById('enter-btn');
+    const bgMusic = document.getElementById('bg-music');
+    const loginScreen = document.getElementById('login-screen');
 
-  // ✅ CORRECT RAW LINKS (GitHub Pages version)
-  const loadingBackgrounds = [
-  './Loading1.gif',
-  './Loading2.gif',
-  './Loading3.gif',
-  './Loading4.gif'
-];
+    // ✅ GitHub Loading GIFs URLs
+    const loadingBackgrounds = [
+        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%201.gif',
+        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%202.gif', 
+        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%203.gif',
+        'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/loading-gifs/Loading%204.gif'
+    ];
 
+    // Fullscreen CSS Styles
+    function applyFullscreenStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            #splash-screen {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                min-width: 100% !important;
+                min-height: 100% !important;
+                background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d) !important;
+                background-size: cover !important;
+                background-position: center center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: center !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                z-index: 9999 !important;
+                overflow: hidden !important;
+            }
 
+            .loading-circle {
+                width: 70px !important;
+                height: 70px !important;
+                border-radius: 50% !important;
+                border: 5px solid transparent !important;
+                border-top: 5px solid white !important;
+                border-right: 5px solid #00aaff !important;
+                border-left: 5px solid #0077cc !important;
+                border-bottom: 5px solid white !important;
+                animation: spin 1.2s linear infinite !important;
+                margin-bottom: 25px !important;
+            }
 
-  // fake loading progress bar
-  function simulateLoadingProcess() {
-    let progress = 0;
-    const loadingInterval = setInterval(() => {
-      progress += Math.random() * 15;
-      if (countdownText)
-        countdownText.textContent = `Loading... ${Math.min(100, Math.round(progress))}%`;
+            .countdown-text {
+                color: white !important;
+                font-size: 18px !important;
+                font-weight: bold !important;
+                margin-top: 20px !important;
+                text-align: center !important;
+                text-shadow: 2px 2px 8px rgba(0,0,0,0.8) !important;
+                background: rgba(0,0,0,0.5) !important;
+                padding: 10px 20px !important;
+                border-radius: 10px !important;
+            }
 
-      if (progress >= 100) {// Function to set random loading background from GitHub with fullscreen support
-function setRandomLoadingBackground() {
-  if (splashScreen) {
-    const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
-    const randomBackground = loadingBackgrounds[randomIndex];
-    
-    console.log('Setting fullscreen loading background:', randomBackground);
-    
-    // Create test image to verify loading
-    const testImg = new Image();
-    testImg.onload = function() {
-      console.log('✅ Fullscreen Background GIF loaded successfully');
-      splashScreen.style.backgroundImage = `url('${randomBackground}')`;
-      splashScreen.style.backgroundSize = 'cover';
-      splashScreen.style.backgroundPosition = 'center center';
-      splashScreen.style.backgroundRepeat = 'no-repeat';
-    };
-    testImg.onerror = function() {
-      console.log('❌ Background GIF failed to load, using blue gradient fallback');
-      // GIF မပေါ်ရင် Blue Gradient Background သုံးမယ်
-      splashScreen.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)';
-      splashScreen.style.backgroundImage = 'none';
-    };
-    testImg.src = randomBackground;
-  }
-}
+            .enter-btn {
+                margin-top: 30px !important;
+                padding: 15px 40px !important;
+                font-size: 18px !important;
+                background: linear-gradient(145deg, #00aaff, #0077cc) !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 12px !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                box-shadow: 0 6px 20px rgba(0, 153, 255, 0.6) !important;
+                font-weight: bold !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1px !important;
+            }
 
-// Fullscreen loading initialization
-function initializeSplashScreen() {
-  console.log('=== Initializing Fullscreen Splash Screen ===');
-  
-  // Set fullscreen blue background first
-  if (splashScreen) {
-    splashScreen.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)';
-    splashScreen.style.backgroundSize = 'cover';
-    splashScreen.style.backgroundPosition = 'center center';
-  }
-  
-  // Set random loading background
-  setRandomLoadingBackground();
-  
-  // Preload all GIFs
-  preloadLoadingGifs();
-  
-  // Hide other screens
-  if (mainScreen) {
-    mainScreen.style.display = 'none';
-  }
-  
-  if (loginScreen) {
-    loginScreen.style.display = 'none';
-  }
+            .enter-btn:hover {
+                transform: translateY(-3px) !important;
+                box-shadow: 0 8px 25px rgba(0, 153, 255, 0.8) !important;
+                background: linear-gradient(145deg, #0077cc, #0055aa) !important;
+            }
 
-  // Show loading text
-  if (countdownText) {
-    countdownText.textContent = "Loading...";
-  }
+            .enter-btn:active {
+                transform: translateY(-1px) !important;
+            }
 
-  // Simulate loading process
-  simulateLoadingProcess();
-  }
-        
-        clearInterval(loadingInterval);
-        showEnterButton();
-      }
-    }, 300);
-  }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
 
-  // show button after loading
-  function showEnterButton() {
-    if (countdownText) countdownText.style.display = 'none';
-    if (enterBtn) {
-      enterBtn.style.display = 'block';
-      enterBtn.style.animation = 'fadeIn 0.5s ease-in';
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+
+            @keyframes textGlow {
+                0%, 100% { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+                50% { text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 30px rgba(0,153,255,0.6); }
+            }
+
+            .loading-text-glow {
+                animation: textGlow 2s ease-in-out infinite !important;
+            }
+        `;
+        document.head.appendChild(style);
     }
-  }
 
-  // ✅ (3) Button click → only then hide splash + show home/login
-  function setupEnterButton() {
-    if (!enterBtn) return;
-    enterBtn.addEventListener('click', function() {
-      const user = checkUserLogin();
+    // Debug function to check image loading
+    function debugImageLoading() {
+        console.log('=== DEBUG: Checking GIF Loading ===');
+        loadingBackgrounds.forEach((url, index) => {
+            const img = new Image();
+            img.onload = () => console.log(`✅ GIF ${index + 1} loaded: ${url}`);
+            img.onerror = () => console.log(`❌ GIF ${index + 1} failed: ${url}`);
+            img.src = url;
+        });
+    }
 
-      splashScreen.style.transition = 'opacity 1s ease';
-      splashScreen.style.opacity = '0';
+    // Function to set random loading background from GitHub
+    function setRandomLoadingBackground() {
+        if (splashScreen) {
+            const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
+            const randomBackground = loadingBackgrounds[randomIndex];
+            
+            console.log('🎨 Setting fullscreen loading background:', randomBackground);
+            
+            // Create test image to verify loading
+            const testImg = new Image();
+            testImg.onload = function() {
+                console.log('✅ Fullscreen Background GIF loaded successfully');
+                splashScreen.style.backgroundImage = `url('${randomBackground}')`;
+                splashScreen.style.backgroundSize = 'cover';
+                splashScreen.style.backgroundPosition = 'center center';
+                splashScreen.style.backgroundRepeat = 'no-repeat';
+                
+                // Add success animation
+                splashScreen.style.animation = 'fadeIn 0.8s ease';
+            };
+            testImg.onerror = function() {
+                console.log('❌ Background GIF failed to load, using blue gradient fallback');
+                // Use beautiful gradient fallback
+                splashScreen.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)';
+                splashScreen.style.backgroundImage = 'none';
+                splashScreen.style.animation = 'fadeIn 0.8s ease';
+            };
+            testImg.src = randomBackground;
+        }
+    }
 
-      setTimeout(() => {
-        splashScreen.style.display = 'none';
+    // Preload all loading GIFs for faster switching
+    function preloadLoadingGifs() {
+        let loadedCount = 0;
+        const totalGifs = loadingBackgrounds.length;
+        
+        console.log('🔄 Preloading GIFs...');
+        
+        loadingBackgrounds.forEach(url => {
+            const img = new Image();
+            img.onload = () => {
+                loadedCount++;
+                console.log(`✅ Preloaded: ${loadedCount}/${totalGifs}`);
+                
+                // Update loading progress
+                if (countdownText) {
+                    const progress = Math.round((loadedCount / totalGifs) * 100);
+                    countdownText.innerHTML = `Loading Assets...<br><small>${progress}% Complete</small>`;
+                }
+                
+                if (loadedCount === totalGifs) {
+                    console.log('🎉 All GIFs preloaded successfully!');
+                    if (countdownText) {
+                        countdownText.innerHTML = 'Ready!<br><small>Click Enter to Start</small>';
+                        countdownText.classList.add('loading-text-glow');
+                    }
+                }
+            };
+            img.onerror = () => {
+                console.log(`❌ Failed to preload: ${url}`);
+                loadedCount++; // Count errors too to continue progress
+            };
+            img.src = url;
+        });
+    }
 
-        if (user) {
-          if (mainScreen) mainScreen.style.display = 'block';
-        } else {
-          if (loginScreen) loginScreen.style.display = 'flex';
+    // Check if user is logged in
+    function checkUserLogin() {
+        const savedUser = localStorage.getItem('currentUser');
+        return savedUser ? JSON.parse(savedUser) : null;
+    }
+
+    // Simulate loading process with progress
+    function simulateLoadingProcess() {
+        let progress = 0;
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 12;
+            
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadingInterval);
+                
+                // Loading complete - show enter button
+                showEnterButton();
+            }
+            
+            // Update loading text with animated progress
+            if (countdownText) {
+                countdownText.innerHTML = `Loading System...<br><small>${Math.min(100, Math.round(progress))}% Complete</small>`;
+                
+                // Add glow effect when near completion
+                if (progress > 80) {
+                    countdownText.classList.add('loading-text-glow');
+                }
+            }
+            
+        }, 200);
+    }
+
+    // Show enter button when loading complete
+    function showEnterButton() {
+        if (countdownText) {
+            countdownText.style.display = 'block';
+            countdownText.innerHTML = 'Ready to Play!<br><small>Click Enter to Start</small>';
+        }
+        
+        if (enterBtn) {
+            enterBtn.style.display = 'block';
+            enterBtn.style.animation = 'fadeIn 0.8s ease, pulse 2s infinite';
+            
+            // Add button hover effects
+            addButtonAnimation();
+        }
+        
+        console.log('🎯 Loading complete - Enter button shown');
+    }
+
+    // Add button hover and click animations
+    function addButtonAnimation() {
+        if (enterBtn) {
+            enterBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+                this.style.boxShadow = '0 10px 30px rgba(0, 153, 255, 0.8)';
+            });
+            
+            enterBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 6px 20px rgba(0, 153, 255, 0.6)';
+            });
+            
+            enterBtn.addEventListener('mousedown', function() {
+                this.style.transform = 'translateY(-1px) scale(0.98)';
+            });
+            
+            enterBtn.addEventListener('mouseup', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+        }
+    }
+
+    // Play background music
+    function playBackgroundMusic() {
+        if (bgMusic) {
+            const playMusic = () => {
+                bgMusic.volume = 0.6;
+                bgMusic.play().then(() => {
+                    console.log('🎵 Background music started');
+                }).catch(e => {
+                    console.log('🔇 Audio play failed:', e);
+                });
+            };
+
+            // Try to play immediately
+            playMusic();
+
+            // Also allow user to interact to play
+            document.addEventListener('click', function playOnClick() {
+                playMusic();
+                document.removeEventListener('click', playOnClick);
+            }, { once: true });
+        }
+    }
+
+    // Enter Button Click Handler
+    function setupEnterButton() {
+        if (enterBtn) {
+            enterBtn.addEventListener('click', function() {
+                // Add click animation
+                this.style.animation = 'pulse 0.3s ease';
+                this.style.transform = 'scale(0.95)';
+                this.disabled = true;
+                
+                // Check user login status
+                const user = checkUserLogin();
+                
+                setTimeout(() => {
+                    // Hide splash screen with fade out
+                    if (splashScreen) {
+                        splashScreen.style.opacity = '0';
+                        splashScreen.style.transition = 'opacity 0.6s ease';
+                    }
+
+                    setTimeout(() => {
+                        if (splashScreen) {
+                            splashScreen.style.display = 'none';
+                        }
+
+                        if (user) {
+                            // User exists - show main screen directly
+                            if (mainScreen) {
+                                mainScreen.style.display = 'block';
+                                mainScreen.style.opacity = '0';
+                                mainScreen.style.animation = 'fadeIn 0.8s ease forwards';
+                            }
+                        } else {
+                            // No user - show login screen
+                            if (loginScreen) {
+                                loginScreen.style.display = 'flex';
+                                loginScreen.style.opacity = '0';
+                                loginScreen.style.animation = 'fadeIn 0.8s ease forwards';
+                            }
+                        }
+
+                        // Play background music
+                        playBackgroundMusic();
+
+                        console.log('🚀 Application started successfully');
+
+                    }, 600);
+                }, 300);
+            });
+        }
+    }
+
+    // Initialize fullscreen loading system
+    function initializeFullscreenLoading() {
+        console.log('🚀 Starting Fullscreen Loading System...');
+        
+        // Apply fullscreen styles first
+        applyFullscreenStyles();
+        
+        // Set initial fullscreen background
+        if (splashScreen) {
+            splashScreen.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)';
+        }
+        
+        // Hide other screens
+        if (mainScreen) {
+            mainScreen.style.display = 'none';
+        }
+        
+        if (loginScreen) {
+            loginScreen.style.display = 'none';
         }
 
-        playBackgroundMusic();
-      }, 1000);
-    });
-  }
+        // Set random loading background
+        setRandomLoadingBackground();
+        
+        // Preload all GIFs
+        preloadLoadingGifs();
+        
+        // Setup enter button
+        setupEnterButton();
+        
+        // Start loading simulation
+        simulateLoadingProcess();
+        
+        // Auto debug after 2 seconds
+        setTimeout(() => {
+            debugImageLoading();
+        }, 2000);
+        
+        console.log('✅ Fullscreen Loading System initialized');
+    }
 
-  // play bgm
-  function playBackgroundMusic() {
-    if (!bgMusic) return;
-    bgMusic.volume = 0.7;
-    bgMusic.play().catch(() => {
-      document.addEventListener('click', function play() {
-        bgMusic.play();
-        document.removeEventListener('click', play);
-      });
-    });
-  }
-
-  // CSS animation styles
-  function addCustomStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      #splash-screen { transition: opacity 0.5s ease; }
-      .enter-btn { transition: all 0.3s ease; }
-    `;
-    document.head.appendChild(style);
-  }
-
-  function init() {
-    addCustomStyles();
-    initializeSplashScreen();
-    setupEnterButton();
-  }
-
-  init();
+    // Start the fullscreen loading system
+    initializeFullscreenLoading();
 });
 
+  
     
 
 
