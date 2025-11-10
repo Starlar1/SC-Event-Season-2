@@ -352,16 +352,17 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  /* background-image: url('https://i.ibb.co/jPSZTK7N/Grid-Art-20251102-171849001.jpg'); ← ဒီလိုင်းကို ဖျက်ပါ */
-  background-size: 100% 100%;
+  background-size: cover; /* ဒီလိုင်းကိုပြောင်းလိုက်ပါ */
   background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
   padding-bottom: 80px;
   z-index: 9999;
-}
+  background-color: #0000ff; /* Blue Screen အတွက် */
+  }
 
 /* လည်နေသော အဝိုင်း (သေး version) */
 .loading-circle {
@@ -4119,33 +4120,54 @@ document.addEventListener('DOMContentLoaded', function() {
   const bgMusic = document.getElementById('bg-music');
   const loginScreen = document.getElementById('login-screen');
 
-  // ✅ CORRECT RAW LINKS (GitHub Pages version)
-  const loadingBackgrounds = [
-    './Loading1.gif',
-    './Loading2.gif',
-    './Loading3.gif',
-    './Loading4.gif'
-  ];
+// ✅ CORRECT RAW LINKS (GitHub Pages version)
+const loadingBackgrounds = [
+  './Loading1.gif',
+  './Loading2.gif',
+  './Loading3.gif',
+  './Loading4.gif'
+];
 
-  // ✅ (1) Random Loading GIF ပြဖို့ Function
-  function setRandomLoadingBackground() {
-    if (splashScreen) {
-      const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
-      const randomBackground = loadingBackgrounds[randomIndex];
+// ✅ (1) Random Loading GIF ပြဖို့ Function
+function setRandomLoadingBackground() {
+  if (splashScreen) {
+    const randomIndex = Math.floor(Math.random() * loadingBackgrounds.length);
+    const randomBackground = loadingBackgrounds[randomIndex];
+    
+    // ပုံမပေါ်သေးရင် Blue Screen ပြမယ်
+    const img = new Image();
+    img.onload = function() {
+      // ပုံပေါ်ရင် GIF ကိုသုံးမယ်
       splashScreen.style.backgroundImage = `url('${randomBackground}')`;
-      splashScreen.style.backgroundSize = 'contain';
+      splashScreen.style.backgroundSize = 'cover'; /* ဒီလိုင်းကိုပြောင်းလိုက်ပါ */
       splashScreen.style.backgroundRepeat = 'no-repeat';
       splashScreen.style.backgroundPosition = 'center';
       console.log('🎨 Using loading GIF:', randomBackground);
-    }
+    };
+    
+    img.onerror = function() {
+      // ပုံမပေါ်ရင် Blue Screen ပြမယ်
+      splashScreen.style.backgroundImage = 'none';
+      splashScreen.style.backgroundColor = '#0000ff'; /* Blue Screen */
+      console.log('❌ Loading GIF failed, using blue screen');
+    };
+    
+    img.src = randomBackground;
+  }
   }
 
-  // Preload all loading GIFs (optional for performance)
-  function preloadLoadingGifs() {
-    loadingBackgrounds.forEach(url => {
-      const img = new Image();
-      img.src = url;
-    });
+// Preload all loading GIFs (optional for performance)
+function preloadLoadingGifs() {
+  loadingBackgrounds.forEach(url => {
+    const img = new Image();
+    img.onload = function() {
+      console.log('✅ Preloaded:', url);
+    };
+    img.onerror = function() {
+      console.log('❌ Failed to preload:', url);
+    };
+    img.src = url;
+  });
   }
 
   // Check if user is logged in
@@ -4154,18 +4176,26 @@ document.addEventListener('DOMContentLoaded', function() {
     return savedUser ? JSON.parse(savedUser) : null;
   }
 
-  // ✅ (2) Splash initialization
-  function initializeSplashScreen() {
-    console.log('=== Initializing Splash Screen ===');
+// ✅ (2) Splash initialization
+function initializeSplashScreen() {
+  console.log('=== Initializing Splash Screen ===');
 
-    // hide other screens
-    if (mainScreen) mainScreen.style.display = 'none';
-    if (loginScreen) loginScreen.style.display = 'none';
+  // hide other screens
+  if (mainScreen) mainScreen.style.display = 'none';
+  if (loginScreen) loginScreen.style.display = 'none';
 
-    // show splash + random gif
-    if (splashScreen) splashScreen.style.display = 'flex';
-    setRandomLoadingBackground();
-    preloadLoadingGifs();
+  // show splash + random gif
+  if (splashScreen) {
+    splashScreen.style.display = 'flex';
+    // Blue Screen ကို default အနေနဲ့ထားမယ်
+    splashScreen.style.backgroundColor = '#0000ff';
+    splashScreen.style.backgroundImage = 'none';
+  }
+  
+  preloadLoadingGifs();
+  setRandomLoadingBackground();
+  simulateLoadingProcess();
+  }
 
     // loading animation
     simulateLoadingProcess();
