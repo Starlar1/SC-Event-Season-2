@@ -6501,7 +6501,700 @@ displayServerStatus();
 
 // ===== COMPACT DOWNLOAD SYSTEM WITH DRAG & DROP FIX =====
 
+class DownloadManager {
+    constructor() {
+        this.isDownloading = false;
+        this.downloadQueue = [];
+        this.downloadedCount = 0;
+        this.totalImages = 0;
+        this.currentIndex = 0;
+        this.skippedImages = new Set();
+        this.failedImages = new Set();
+        
+        // GIF Download System
+        this.gifDownloadManager = new GifDownloadManager();
+        
+        this.initializeElements();
+        this.setupEventListeners();
+        this.loadImageList();
+        this.checkLocalStorage();
+        this.replaceOnlineImagesWithLocal();
+        this.setupDragAndDrop();
+        
+        // Auto start GIF download
+        setTimeout(() => {
+            this.gifDownloadManager.downloadAllGifs();
+        }, 3000);
+    }
 
+    initializeElements() {
+        this.elements = {
+            downloadToggle: document.getElementById('download-toggle'),
+            downloadPanel: document.getElementById('download-panel'),
+            closePanel: document.getElementById('close-panel'),
+            startDownload: document.getElementById('start-download'),
+            clearStorage: document.getElementById('clear-storage'),
+            progressCircle: document.querySelector('.progress-ring-circle'),
+            progressText: document.querySelector('.progress-text'),
+            totalImages: document.getElementById('total-images'),
+            downloadedCount: document.getElementById('downloaded-count'),
+            currentImage: document.getElementById('current-image'),
+            downloadList: document.getElementById('download-list'),
+            storageCount: document.getElementById('storage-count'),
+            cacheSize: document.getElementById('cache-size')
+        };
+
+        // Initialize GIF Download Panel
+        this.initializeGifDownloadPanel();
+    }
+
+    // GIF Download Panel ထည့်သွင်းခြင်း
+    initializeGifDownloadPanel() {
+        const downloadPanel = this.elements.downloadPanel;
+        if (!downloadPanel) return;
+
+        // Add GIF download section to panel
+        const gifDownloadSection = document.createElement('div');
+        gifDownloadSection.className = 'gif-download-section';
+        gifDownloadSection.innerHTML = `
+            <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; margin-top: 15px;">
+                <h4 style="margin-bottom: 10px; color: #007bff;">GIF Downloads</h4>
+                <div class="download-progress">
+                    <div class="progress-circle">
+                        <svg class="progress-ring" viewBox="0 0 100 100">
+                            <circle class="progress-ring-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="progress-ring-circle" cx="50" cy="50" r="45" 
+                                    stroke-dasharray="283" stroke-dashoffset="283"></circle>
+                        </svg>
+                        <div class="progress-text" id="gif-download-progress">0%</div>
+                    </div>
+                </div>
+                <div class="download-status" id="gif-download-status">
+                    Total GIFs: <span>4</span><br>
+                    Downloaded: <span>0</span><br>
+                    Failed: <span>0</span>
+                </div>
+                <div class="download-list" id="gif-download-list" style="max-height: 120px;"></div>
+                <div class="download-actions" style="margin-top: 10px;">
+                    <button class="download-btn" id="start-gif-download" style="background: #28a745;">
+                        Download GIFs
+                    </button>
+                    <button class="download-btn secondary" id="clear-gif-download" style="background: #dc3545;">
+                        Clear GIFs
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Insert after existing content
+        const existingActions = downloadPanel.querySelector('.download-actions');
+        if (existingActions) {
+            existingActions.parentNode.insertBefore(gifDownloadSection, existingActions);
+        } else {
+            downloadPanel.appendChild(gifDownloadSection);
+        }
+
+        // Add GIF download event listeners
+        const startGifBtn = document.getElementById('start-gif-download');
+        const clearGifBtn = document.getElementById('clear-gif-download');
+        
+        if (startGifBtn) {
+            startGifBtn.addEventListener('click', () => {
+                this.gifDownloadManager.downloadAllGifs();
+            });
+        }
+
+        if (clearGifBtn) {
+            clearGifBtn.addEventListener('click', () => {
+                if (confirm('All downloaded GIFs will be cleared. Continue?')) {
+                    this.gifDownloadManager.clearDownloadedGifs();
+                }
+            });
+        }
+
+        // Initial update
+        this.gifDownloadManager.updateDownloadPanel();
+    }
+
+    setupEventListeners() {
+        // Download toggle - CLICK TO OPEN PANEL
+        if (this.elements.downloadToggle) {
+            this.elements.downloadToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.togglePanel();
+            });
+        }
+
+        // Close panel
+        if (this.elements.closePanel) {
+            this.elements.closePanel.addEventListener('click', () => {
+                this.closePanel();
+            });
+        }
+
+        // Start/Stop download button
+        if (this.elements.startDownload) {
+            this.elements.startDownload.addEventListener('click', () => {
+                if (this.isDownloading) {
+                    this.stopDownload();
+                } else {
+                    this.startSequentialDownload();
+                }
+            });
+        }
+
+        // Clear storage
+        if (this.elements.clearStorage) {
+            this.elements.clearStorage.addEventListener('click', () => {
+                this.clearLocalStorage();
+            });
+        }
+
+        // Close panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.elements.downloadPanel && this.elements.downloadPanel.classList.contains('show') && 
+                !this.elements.downloadPanel.contains(e.target) && 
+                !this.elements.downloadToggle.contains(e.target)) {
+                this.closePanel();
+            }
+        });
+    }
+
+    // 🔄 DRAG & DROP FIXED VERSION - CLICK AND DRAG TO MOVE
+    setupDragAndDrop() {
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        const downloadIndicator = document.querySelector('.download-indicator');
+
+        if (!downloadIndicator) {
+            console.log('Download indicator not found');
+            return;
+        }
+
+        // Mouse events - CLICK AND DRAG
+        this.elements.downloadToggle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            const rect = downloadIndicator.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+            this.elements.downloadToggle.style.cursor = 'grabbing';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const x = e.clientX - dragOffset.x;
+            const y = e.clientY - dragOffset.y;
+            
+            // Screen boundaries
+            const maxX = window.innerWidth - downloadIndicator.offsetWidth;
+            const maxY = window.innerHeight - downloadIndicator.offsetHeight;
+            
+            // Apply new position
+            downloadIndicator.style.left = Math.min(Math.max(0, x), maxX) + 'px';
+            downloadIndicator.style.top = Math.min(Math.max(0, y), maxY) + 'px';
+            downloadIndicator.style.right = 'auto';
+            downloadIndicator.style.bottom = 'auto';
+            downloadIndicator.style.transform = 'none';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            this.elements.downloadToggle.style.cursor = 'pointer';
+        });
+
+        // Touch events for mobile - TOUCH AND DRAG
+        this.elements.downloadToggle.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            const touch = e.touches[0];
+            const rect = downloadIndicator.getBoundingClientRect();
+            dragOffset.x = touch.clientX - rect.left;
+            dragOffset.y = touch.clientY - rect.top;
+            e.preventDefault();
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const touch = e.touches[0];
+            const x = touch.clientX - dragOffset.x;
+            const y = touch.clientY - dragOffset.y;
+            
+            // Screen boundaries
+            const maxX = window.innerWidth - downloadIndicator.offsetWidth;
+            const maxY = window.innerHeight - downloadIndicator.offsetHeight;
+            
+            // Apply new position
+            downloadIndicator.style.left = Math.min(Math.max(0, x), maxX) + 'px';
+            downloadIndicator.style.top = Math.min(Math.max(0, y), maxY) + 'px';
+            downloadIndicator.style.right = 'auto';
+            downloadIndicator.style.bottom = 'auto';
+            downloadIndicator.style.transform = 'none';
+            
+            e.preventDefault();
+        });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        console.log('Drag & Drop initialized successfully - Click and drag to move');
+    }
+
+    // TOGGLE PANEL - CLICK TO OPEN/CLOSE
+    togglePanel() {
+        this.elements.downloadPanel.classList.toggle('show');
+        if (this.elements.downloadPanel.classList.contains('show')) {
+            this.checkLocalStorage();
+            this.gifDownloadManager.updateDownloadPanel();
+        }
+    }
+
+    // CLOSE PANEL
+    closePanel() {
+        this.elements.downloadPanel.classList.remove('show');
+    }
+
+    loadImageList() {
+        // Define essential background images only (smaller set)
+        this.downloadQueue = [
+            { url: 'https://iili.io/KOZgBK7.jpg', name: 'Login BG' },
+            { url: 'https://i.ibb.co/jPSZTK7N/Grid-Art-20251102-171849001.jpg', name: 'Splash BG' },
+            { url: 'https://iili.io/KLTH42I.jpg', name: 'Main BG' },
+            { url: 'https://i.ibb.co/NnNCQB4w/f0f2fcc3fa181bcdcdeea7558c6bda43.jpg', name: 'Event BG' },
+            { url: 'https://i.ibb.co/FLT1LhqQ/f9ace1a0821b26ca96f698d873d697ab.jpg', name: 'Exchange BG' },
+            { url: 'https://iili.io/KOZNH0J.jpg', name: 'Rank BG' },
+            { url: 'https://i.ibb.co/spwHMt08/Grid-Art-20251023-165052122.jpg', name: 'Game BG' },
+            { url: 'https://i.ibb.co/7d0ZQwSQ/26af0e228da2cdf8b5af4425313603a8.jpg', name: 'Pumpkin BG' }
+        ];
+
+        this.totalImages = this.downloadQueue.length;
+        if (this.elements.totalImages) {
+            this.elements.totalImages.textContent = this.totalImages;
+        }
+        
+        this.populateDownloadList();
+    }
+
+    populateDownloadList() {
+        if (!this.elements.downloadList) return;
+        
+        this.elements.downloadList.innerHTML = '';
+        
+        this.downloadQueue.forEach((image, index) => {
+            const item = document.createElement('div');
+            item.className = 'download-item';
+            item.innerHTML = `
+                <div class="download-item-info">
+                    <div class="download-item-name">${image.name}</div>
+                    <div class="download-item-status">စောင့်ဆိုင်း</div>
+                </div>
+            `;
+            this.elements.downloadList.appendChild(item);
+        });
+    }
+
+    checkLocalStorage() {
+        const storedImages = this.getStoredImages();
+        this.localStorageUsed = storedImages.length;
+        this.downloadedCount = this.localStorageUsed;
+        
+        if (this.elements.downloadedCount) {
+            this.elements.downloadedCount.textContent = this.downloadedCount;
+        }
+        if (this.elements.storageCount) {
+            this.elements.storageCount.textContent = this.downloadedCount;
+        }
+        
+        const listItems = this.elements.downloadList?.querySelectorAll('.download-item');
+        if (listItems) {
+            this.downloadQueue.forEach((image, index) => {
+                if (listItems[index]) {
+                    const statusElem = listItems[index].querySelector('.download-item-status');
+                    const isStored = storedImages.some(stored => stored.originalUrl === image.url);
+                    
+                    if (isStored) {
+                        statusElem.textContent = 'ပြီးပြီ ✓';
+                        statusElem.style.color = '#90ee90';
+                    } else if (this.failedImages.has(index)) {
+                        statusElem.textContent = 'မအောင်မြင်';
+                        statusElem.style.color = '#dc3545';
+                    } else {
+                        statusElem.textContent = 'စောင့်ဆိုင်း';
+                        statusElem.style.color = '#ffcc00';
+                    }
+                }
+            });
+        }
+        
+        if (this.localStorageUsed === this.totalImages) {
+            this.elements.downloadToggle?.classList.add('completed');
+            if (this.elements.startDownload) {
+                this.elements.startDownload.disabled = true;
+                this.elements.startDownload.textContent = 'အားလုံးပြီးပြီ';
+                this.elements.startDownload.classList.add('completed');
+            }
+        } else {
+            this.elements.downloadToggle?.classList.remove('completed');
+            if (this.elements.startDownload) {
+                this.elements.startDownload.disabled = false;
+                if (!this.isDownloading) {
+                    this.elements.startDownload.textContent = 'အားလုံးဒေါင်းလုဒ်';
+                    this.elements.startDownload.classList.remove('stopped');
+                }
+            }
+        }
+
+        this.updateProgress((this.downloadedCount / this.totalImages) * 100);
+        this.updateCacheSize();
+    }
+
+    async startSequentialDownload() {
+        if (this.isDownloading) return;
+        
+        this.isDownloading = true;
+        this.currentIndex = 0;
+        
+        this.updateUIForDownloadStart();
+        await this.downloadNextImage();
+    }
+
+    async downloadNextImage() {
+        while (this.currentIndex < this.downloadQueue.length && this.isDownloading) {
+            const image = this.downloadQueue[this.currentIndex];
+            const isAlreadyStored = this.isImageStored(image.url);
+            const isStopped = this.skippedImages.has(this.currentIndex);
+            
+            if (!isAlreadyStored && !isStopped) {
+                const success = await this.downloadAndStoreImage(image, this.currentIndex);
+                if (success) {
+                    this.failedImages.delete(this.currentIndex);
+                } else {
+                    this.failedImages.add(this.currentIndex);
+                }
+            }
+            this.currentIndex++;
+            
+            if (this.isDownloading) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+            } else {
+                break;
+            }
+        }
+        
+        if (this.currentIndex >= this.downloadQueue.length && this.isDownloading) {
+            this.downloadComplete();
+        }
+    }
+
+    async downloadAndStoreImage(image, index) {
+        return new Promise((resolve) => {
+            if (this.elements.currentImage) {
+                this.elements.currentImage.textContent = `${image.name} (${index + 1}/${this.totalImages})`;
+            }
+            
+            const listItems = this.elements.downloadList?.querySelectorAll('.download-item');
+            if (listItems && listItems[index]) {
+                const statusElem = listItems[index].querySelector('.download-item-status');
+                statusElem.textContent = 'ဒေါင်းလုဒ်လုပ်...';
+                statusElem.style.color = '#007bff';
+            }
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 20000);
+            
+            fetch(image.url, { 
+                signal: controller.signal,
+                mode: 'cors'
+            })
+                .then(response => {
+                    clearTimeout(timeoutId);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.blob();
+                })
+                .then(blob => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = () => reject(new Error('FileReader error'));
+                        reader.readAsDataURL(blob);
+                    });
+                })
+                .then(base64Data => {
+                    const success = this.storeImage(image.url, base64Data, image.name);
+                    
+                    if (success) {
+                        this.downloadedCount++;
+                        
+                        const progress = (this.downloadedCount / this.totalImages) * 100;
+                        this.updateProgress(progress);
+                        
+                        if (listItems && listItems[index]) {
+                            const statusElem = listItems[index].querySelector('.download-item-status');
+                            statusElem.textContent = 'ပြီးပြီ ✓';
+                            statusElem.style.color = '#90ee90';
+                        }
+                        
+                        if (this.elements.downloadedCount) {
+                            this.elements.downloadedCount.textContent = this.downloadedCount;
+                        }
+                        if (this.elements.storageCount) {
+                            this.elements.storageCount.textContent = this.downloadedCount;
+                        }
+                        
+                        resolve(true);
+                    } else {
+                        throw new Error('Storage failed');
+                    }
+                })
+                .catch(error => {
+                    clearTimeout(timeoutId);
+                    
+                    const listItems = this.elements.downloadList?.querySelectorAll('.download-item');
+                    if (listItems && listItems[index]) {
+                        const statusElem = listItems[index].querySelector('.download-item-status');
+                        statusElem.textContent = 'မအောင်မြင်';
+                        statusElem.style.color = '#dc3545';
+                    }
+                    
+                    resolve(false);
+                });
+        });
+    }
+
+    stopDownload() {
+        this.isDownloading = false;
+        
+        if (this.elements.startDownload) {
+            this.elements.startDownload.disabled = false;
+            this.elements.startDownload.textContent = 'အားလုံးဒေါင်းလုဒ်';
+            this.elements.startDownload.classList.remove('stopped');
+        }
+        this.elements.downloadToggle?.classList.remove('loading');
+        if (this.elements.currentImage) {
+            this.elements.currentImage.textContent = 'ရပ်လိုက်သည်';
+        }
+        
+        this.showNotification('ဒေါင်းလုဒ်ရပ်လိုက်သည်။', 'info');
+    }
+
+    updateUIForDownloadStart() {
+        if (this.elements.startDownload) {
+            this.elements.startDownload.disabled = false;
+            this.elements.startDownload.textContent = 'ရပ်မည်';
+            this.elements.startDownload.classList.add('stopped');
+        }
+        this.elements.downloadToggle?.classList.add('loading');
+        this.updateProgress((this.downloadedCount / this.totalImages) * 100);
+    }
+
+    storeImage(originalUrl, base64Data, name) {
+        try {
+            const storedImages = this.getStoredImages();
+            const existingIndex = storedImages.findIndex(img => img.originalUrl === originalUrl);
+            
+            const imageData = {
+                originalUrl: originalUrl,
+                base64Data: base64Data,
+                name: name,
+                storedAt: new Date().toISOString(),
+                size: base64Data.length
+            };
+            
+            if (existingIndex !== -1) {
+                storedImages[existingIndex] = imageData;
+            } else {
+                storedImages.push(imageData);
+            }
+            
+            localStorage.setItem('downloadedImages', JSON.stringify(storedImages));
+            this.updateCacheSize();
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    getStoredImages() {
+        try {
+            const stored = localStorage.getItem('downloadedImages');
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    isImageStored(url) {
+        const storedImages = this.getStoredImages();
+        return storedImages.some(img => img.originalUrl === url);
+    }
+
+    getStoredImageData(url) {
+        const storedImages = this.getStoredImages();
+        const stored = storedImages.find(img => img.originalUrl === url);
+        return stored ? stored.base64Data : null;
+    }
+
+    replaceOnlineImagesWithLocal() {
+        // Replace background images in elements
+        const elements = document.querySelectorAll('*');
+        
+        elements.forEach(el => {
+            const style = window.getComputedStyle(el);
+            const bgImage = style.backgroundImage;
+            
+            if (bgImage && bgImage !== 'none') {
+                const urlMatch = bgImage.match(/url\(["']?(.*?)["']?\)/);
+                if (urlMatch && urlMatch[1]) {
+                    let bgUrl = urlMatch[1].replace(/['"]/g, '');
+                    const storedData = this.getStoredImageData(bgUrl);
+                    
+                    if (storedData) {
+                        el.style.backgroundImage = `url("${storedData}")`;
+                    }
+                }
+            }
+        });
+    }
+
+    updateProgress(percentage) {
+        const progress = Math.min(100, Math.max(0, percentage));
+        const circumference = 283;
+        const offset = circumference - (progress / 100) * circumference;
+        
+        if (this.elements.progressCircle) {
+            this.elements.progressCircle.style.strokeDashoffset = offset;
+        }
+        if (this.elements.progressText) {
+            this.elements.progressText.textContent = Math.round(progress) + '%';
+        }
+    }
+
+    updateCacheSize() {
+        const storedImages = this.getStoredImages();
+        let totalSize = 0;
+        
+        storedImages.forEach(img => {
+            totalSize += img.size || 0;
+        });
+        
+        const sizeKB = Math.round(totalSize / 1024);
+        if (this.elements.cacheSize) {
+            this.elements.cacheSize.textContent = sizeKB + ' KB';
+        }
+    }
+
+    downloadComplete() {
+        this.isDownloading = false;
+        
+        const pendingCount = this.totalImages - this.downloadedCount;
+        
+        if (this.elements.startDownload) {
+            this.elements.startDownload.disabled = false;
+            this.elements.startDownload.textContent = pendingCount > 0 ? 
+                `ကျန်ရှိဒေါင်းလုဒ် (${pendingCount})` : 
+                'အားလုံးပြီးပြီ';
+            
+            if (pendingCount === 0) {
+                this.elements.startDownload.classList.add('completed');
+                this.elements.downloadToggle?.classList.add('completed');
+            } else {
+                this.elements.startDownload.classList.remove('completed');
+            }
+        }
+        
+        this.elements.downloadToggle?.classList.remove('loading');
+        if (this.elements.currentImage) {
+            this.elements.currentImage.textContent = pendingCount > 0 ? 
+                `ပြီးပြီ (${pendingCount} ကျန်)` : 
+                'အားလုံးပြီးပြီ!';
+        }
+        
+        this.updateProgress(100);
+        this.checkLocalStorage();
+        this.replaceOnlineImagesWithLocal();
+        
+        if (pendingCount === 0) {
+            this.showNotification('ဒေါင်းလုဒ်အားလုံးပြီးဆုံးပါပြီ!', 'success');
+        }
+    }
+
+    clearLocalStorage() {
+        if (confirm('ဒေါင်းလုဒ်လုပ်ထားသောပုံအားလုံးကိုဖျက်မှာသေချာပါသလား?')) {
+            localStorage.removeItem('downloadedImages');
+            this.skippedImages.clear();
+            this.failedImages.clear();
+            this.downloadedCount = 0;
+            this.currentIndex = 0;
+            this.checkLocalStorage();
+            this.elements.downloadToggle?.classList.remove('completed');
+            if (this.elements.startDownload) {
+                this.elements.startDownload.disabled = false;
+                this.elements.startDownload.textContent = 'အားလုံးဒေါင်းလုဒ်';
+                this.elements.startDownload.classList.remove('completed', 'stopped');
+            }
+            
+            this.showNotification('ဒေါင်းလုဒ်လုပ်ထားသောပုံအားလုံးကိုဖျက်လိုက်ပါပြီ။', 'info');
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        // Remove existing notification
+        const existingNotification = document.querySelector('.download-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        // Create new notification
+        const notification = document.createElement('div');
+        notification.className = 'download-notification';
+        
+        // Set style based on type
+        const backgroundColor = type === 'success' ? 'rgba(40, 167, 69, 0.9)' : 
+                               type === 'error' ? 'rgba(220, 53, 69, 0.9)' : 
+                               type === 'warning' ? 'rgba(255, 193, 7, 0.9)' :
+                               'rgba(0, 123, 255, 0.9)';
+        
+        notification.style.cssText = `
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${backgroundColor};
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            z-index: 10000;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+        `;
+        
+        notification.innerHTML = message;
+        document.body.appendChild(notification);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.downloadManager = new DownloadManager();
+});
                         
                      
 
