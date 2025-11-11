@@ -353,9 +353,10 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url('https://raw.githubusercontent.com/Starlar1/Event1/main/Loading1.gif');
+  /* background-image ကို CSS ထဲကဖယ်ပါ - JavaScript ကနေထည့်မယ် */
   background-size: 100% 100%; /* ပုံကို အပြည့်ပြသ */
   background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: flex-end; /* အောက်ဘက်သို့ချ */
@@ -363,6 +364,7 @@
   padding-bottom: 80px; /* အောက် margin */
   z-index: 9999;
 }
+
 
 /* လည်နေသော အဝိုင်း (သေး version) */
 .loading-circle {
