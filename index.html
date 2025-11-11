@@ -4094,19 +4094,83 @@ document.addEventListener('DOMContentLoaded', function() {
     const enterBtn = document.getElementById('enter-btn');
     const bgMusic = document.getElementById('bg-music');
 
-    // Loading GIFs array - GitHub ကနေ တိုက်ရိုက်ယူမယ်
-    const loadingGifs = [
+    // Loading GIFs array - Local Storage ကနေယူမယ်
+    const loadingGifKeys = [
+        'loading_gif_1',
+        'loading_gif_2', 
+        'loading_gif_3',
+        'loading_gif_4'
+    ];
+
+    // GitHub GIF URLs (Download အတွက်)
+    const githubGifUrls = [
         'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/Loading1.gif',
         'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/Loading2.gif',
         'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/Loading3.gif',
         'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/Loading4.gif'
     ];
 
-
     // Random GIF ရွေးချယ်ခြင်း
     function getRandomLoadingGif() {
-        const randomIndex = Math.floor(Math.random() * loadingGifs.length);
-        return loadingGifs[randomIndex];
+        const availableGifs = loadingGifKeys.filter(key => {
+            return localStorage.getItem(key) !== null;
+        });
+
+        if (availableGifs.length === 0) {
+            // Local မှာမရှိရင် GitHub ကနေယူမယ်
+            const randomIndex = Math.floor(Math.random() * githubGifUrls.length);
+            return githubGifUrls[randomIndex];
+        }
+
+        const randomIndex = Math.floor(Math.random() * availableGifs.length);
+        const selectedKey = availableGifs[randomIndex];
+        const localGifUrl = localStorage.getItem(selectedKey);
+        
+        console.log('Selected local GIF:', selectedKey);
+        return localGifUrl;
+    }
+
+    // GIF Download လုပ်ခြင်း
+    async function downloadGifToLocal(url, storageKey) {
+        try {
+            // ကြိုတင် Download လုပ်ပြီးသားလားစစ်ဆေးခြင်း
+            if (localStorage.getItem(storageKey)) {
+                console.log('GIF already downloaded:', storageKey);
+                return;
+            }
+
+            console.log('Downloading GIF:', url);
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Download failed');
+            
+            const blob = await response.blob();
+            const reader = new FileReader();
+            
+            reader.onload = function() {
+                const base64data = reader.result;
+                localStorage.setItem(storageKey, base64data);
+                console.log('GIF saved to local storage:', storageKey);
+            };
+            
+            reader.readAsDataURL(blob);
+            
+        } catch (error) {
+            console.error('Error downloading GIF:', error);
+        }
+    }
+
+    // GIF အားလုံးကို Download လုပ်ခြင်း
+    async function downloadAllGifs() {
+        console.log('Starting GIF downloads...');
+        
+        for (let i = 0; i < githubGifUrls.length; i++) {
+            await downloadGifToLocal(githubGifUrls[i], loadingGifKeys[i]);
+            // Download တစ်ခုနဲ့တစ်ခုကြား 500ms စောင့်မယ်
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        console.log('All GIF downloads completed');
     }
 
     // Loading Screen ကို Random GIF နဲ့စတင်မယ်
@@ -4114,6 +4178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const randomGif = getRandomLoadingGif();
         if (splashScreen) {
             splashScreen.style.backgroundImage = `url('${randomGif}')`;
+            console.log('Splash screen background set to local GIF');
         }
     }
 
@@ -4121,6 +4186,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (mainScreen) {
         mainScreen.style.display = 'none';
     }
+
+    // GIF Download စတင်မယ် (Background မှာ)
+    downloadAllGifs();
 
     // Loading Screen ကို Initialize လုပ်မယ်
     initializeLoadingScreen();
@@ -4162,6 +4230,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Download Panel ထဲမှာ GIF Download Status ကိုပြသဖို့
+function updateGifDownloadStatus() {
+    const downloadedCount = loadingGifKeys.filter(key => 
+        localStorage.getItem(key) !== null
+    ).length;
+    
+    const totalCount = loadingGifKeys.length;
+    
+    console.log(`GIF Download Status: ${downloadedCount}/${totalCount}`);
+    return { downloaded: downloadedCount, total: totalCount };
+}
+
+// Download Progress ကိုကြည့်ရန် Function
+function checkGifDownloadProgress() {
+    const status = updateGifDownloadStatus();
+    alert(`GIF Download Progress: ${status.downloaded}/${status.total}\n\nပထမအကြိမ်ဝင်တဲ့အခါ GIF များ Download လုပ်နေပါသည်။\nနောက်တစ်ခါဝင်တဲ့အခါ Local ကနေပဲပြသပေးပါမည်။`);
+}
+
+// Page Load တိုင်း Download Status ကိုစစ်ဆေးမယ်
+setTimeout(() => {
+    updateGifDownloadStatus();
+}, 5000);
+  
 // ===== SUPABASE CONFIGURATION (FOUR SERVERS WITH 300 USER LIMIT EACH) =====
 const SUPABASE_SERVERS = {
   server1: {
