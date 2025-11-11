@@ -4086,6 +4086,7 @@ menuButtons.addEventListener('click', (e) => {
   e.stopPropagation();
 });
 
+
 // ===== NEW SPLASH SCREEN CODE =====
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -4094,16 +4095,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const enterBtn = document.getElementById('enter-btn');
     const bgMusic = document.getElementById('bg-music');
 
-    // Loading GIFs array - Local Storage ကနေယူမယ်
-    const loadingGifKeys = [
-        'loading_gif_1',
-        'loading_gif_2', 
-        'loading_gif_3',
-        'loading_gif_4'
-    ];
-
-    // GitHub GIF URLs (Download အတွက်)
-    const githubGifUrls = [
+    // Loading GIFs array - GitHub ကနေ တိုက်ရိုက်ယူမယ်
+    const loadingGifs = [
         'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/Loading1.gif',
         'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/Loading2.gif',
         'https://raw.githubusercontent.com/Starlar1/SC-Event-Season-2/main/Loading3.gif',
@@ -4112,65 +4105,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Random GIF ရွေးချယ်ခြင်း
     function getRandomLoadingGif() {
-        const availableGifs = loadingGifKeys.filter(key => {
-            return localStorage.getItem(key) !== null;
-        });
-
-        if (availableGifs.length === 0) {
-            // Local မှာမရှိရင် GitHub ကနေယူမယ်
-            const randomIndex = Math.floor(Math.random() * githubGifUrls.length);
-            return githubGifUrls[randomIndex];
-        }
-
-        const randomIndex = Math.floor(Math.random() * availableGifs.length);
-        const selectedKey = availableGifs[randomIndex];
-        const localGifUrl = localStorage.getItem(selectedKey);
-        
-        console.log('Selected local GIF:', selectedKey);
-        return localGifUrl;
-    }
-
-    // GIF Download လုပ်ခြင်း
-    async function downloadGifToLocal(url, storageKey) {
-        try {
-            // ကြိုတင် Download လုပ်ပြီးသားလားစစ်ဆေးခြင်း
-            if (localStorage.getItem(storageKey)) {
-                console.log('GIF already downloaded:', storageKey);
-                return;
-            }
-
-            console.log('Downloading GIF:', url);
-            
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Download failed');
-            
-            const blob = await response.blob();
-            const reader = new FileReader();
-            
-            reader.onload = function() {
-                const base64data = reader.result;
-                localStorage.setItem(storageKey, base64data);
-                console.log('GIF saved to local storage:', storageKey);
-            };
-            
-            reader.readAsDataURL(blob);
-            
-        } catch (error) {
-            console.error('Error downloading GIF:', error);
-        }
-    }
-
-    // GIF အားလုံးကို Download လုပ်ခြင်း
-    async function downloadAllGifs() {
-        console.log('Starting GIF downloads...');
-        
-        for (let i = 0; i < githubGifUrls.length; i++) {
-            await downloadGifToLocal(githubGifUrls[i], loadingGifKeys[i]);
-            // Download တစ်ခုနဲ့တစ်ခုကြား 500ms စောင့်မယ်
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
-        
-        console.log('All GIF downloads completed');
+        const randomIndex = Math.floor(Math.random() * loadingGifs.length);
+        console.log('Random GIF selected:', randomIndex, loadingGifs[randomIndex]);
+        return loadingGifs[randomIndex];
     }
 
     // Loading Screen ကို Random GIF နဲ့စတင်မယ်
@@ -4178,7 +4115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const randomGif = getRandomLoadingGif();
         if (splashScreen) {
             splashScreen.style.backgroundImage = `url('${randomGif}')`;
-            console.log('Splash screen background set to local GIF');
+            console.log('Splash screen background set to:', randomGif);
         }
     }
 
@@ -4186,9 +4123,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (mainScreen) {
         mainScreen.style.display = 'none';
     }
-
-    // GIF Download စတင်မယ် (Background မှာ)
-    downloadAllGifs();
 
     // Loading Screen ကို Initialize လုပ်မယ်
     initializeLoadingScreen();
@@ -4230,29 +4164,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-// Download Panel ထဲမှာ GIF Download Status ကိုပြသဖို့
-function updateGifDownloadStatus() {
-    const downloadedCount = loadingGifKeys.filter(key => 
-        localStorage.getItem(key) !== null
-    ).length;
     
-    const totalCount = loadingGifKeys.length;
+
     
-    console.log(`GIF Download Status: ${downloadedCount}/${totalCount}`);
-    return { downloaded: downloadedCount, total: totalCount };
-}
 
-// Download Progress ကိုကြည့်ရန် Function
-function checkGifDownloadProgress() {
-    const status = updateGifDownloadStatus();
-    alert(`GIF Download Progress: ${status.downloaded}/${status.total}\n\nပထမအကြိမ်ဝင်တဲ့အခါ GIF များ Download လုပ်နေပါသည်။\nနောက်တစ်ခါဝင်တဲ့အခါ Local ကနေပဲပြသပေးပါမည်။`);
-}
 
-// Page Load တိုင်း Download Status ကိုစစ်ဆေးမယ်
-setTimeout(() => {
-    updateGifDownloadStatus();
-}, 5000);
   
 // ===== SUPABASE CONFIGURATION (FOUR SERVERS WITH 300 USER LIMIT EACH) =====
 const SUPABASE_SERVERS = {
@@ -6585,6 +6501,7 @@ displayServerStatus();
 
 // ===== COMPACT DOWNLOAD SYSTEM WITH DRAG & DROP FIX =====
 
+
 class DownloadManager {
     constructor() {
         this.isDownloading = false;
@@ -6595,12 +6512,20 @@ class DownloadManager {
         this.skippedImages = new Set();
         this.failedImages = new Set();
         
+        // GIF Download System
+        this.gifDownloadManager = new GifDownloadManager();
+        
         this.initializeElements();
         this.setupEventListeners();
         this.loadImageList();
         this.checkLocalStorage();
         this.replaceOnlineImagesWithLocal();
-        this.setupDragAndDrop(); // Drag & Drop ထည့်သွင်း
+        this.setupDragAndDrop();
+        
+        // Auto start GIF download
+        setTimeout(() => {
+            this.gifDownloadManager.downloadAllGifs();
+        }, 3000);
     }
 
     initializeElements() {
@@ -6619,6 +6544,70 @@ class DownloadManager {
             storageCount: document.getElementById('storage-count'),
             cacheSize: document.getElementById('cache-size')
         };
+
+        // Initialize GIF Download Panel
+        this.initializeGifDownloadPanel();
+    }
+
+    // GIF Download Panel ထည့်သွင်းခြင်း
+    initializeGifDownloadPanel() {
+        const downloadPanel = this.elements.downloadPanel;
+        if (!downloadPanel) return;
+
+        // Add GIF download section to panel
+        const gifDownloadSection = document.createElement('div');
+        gifDownloadSection.className = 'gif-download-section';
+        gifDownloadSection.innerHTML = `
+            <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; margin-top: 15px;">
+                <h4 style="margin-bottom: 10px; color: #007bff;">GIF Downloads</h4>
+                <div class="download-progress">
+                    <div class="progress-circle">
+                        <svg class="progress-ring" viewBox="0 0 100 100">
+                            <circle class="progress-ring-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="progress-ring-circle" cx="50" cy="50" r="45" 
+                                    stroke-dasharray="283" stroke-dashoffset="283"></circle>
+                        </svg>
+                        <div class="progress-text" id="gif-download-progress">0%</div>
+                    </div>
+                </div>
+                <div class="download-status" id="gif-download-status">
+                    Total GIFs: <span>4</span><br>
+                    Downloaded: <span>0</span><br>
+                    Failed: <span>0</span>
+                </div>
+                <div class="download-list" id="gif-download-list" style="max-height: 120px;"></div>
+                <div class="download-actions" style="margin-top: 10px;">
+                    <button class="download-btn" id="start-gif-download" style="background: #28a745;">
+                        Download GIFs
+                    </button>
+                    <button class="download-btn secondary" id="clear-gif-download" style="background: #dc3545;">
+                        Clear GIFs
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Insert after existing content
+        const existingActions = downloadPanel.querySelector('.download-actions');
+        if (existingActions) {
+            existingActions.parentNode.insertBefore(gifDownloadSection, existingActions);
+        } else {
+            downloadPanel.appendChild(gifDownloadSection);
+        }
+
+        // Add GIF download event listeners
+        document.getElementById('start-gif-download').addEventListener('click', () => {
+            this.gifDownloadManager.downloadAllGifs();
+        });
+
+        document.getElementById('clear-gif-download').addEventListener('click', () => {
+            if (confirm('All downloaded GIFs will be cleared. Continue?')) {
+                this.gifDownloadManager.clearDownloadedGifs();
+            }
+        });
+
+        // Initial update
+        this.gifDownloadManager.updateDownloadPanel();
     }
 
     setupEventListeners() {
@@ -6751,6 +6740,7 @@ class DownloadManager {
         this.elements.downloadPanel.classList.toggle('show');
         if (this.elements.downloadPanel.classList.contains('show')) {
             this.checkLocalStorage();
+            this.gifDownloadManager.updateDownloadPanel();
         }
     }
 
@@ -7197,6 +7187,18 @@ class DownloadManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.downloadManager = new DownloadManager();
 });
+        
+
+  
+    
+
+    
+
+    
+
+    
+
+    
 
 // Add compact styles with drag improvements
 const compactStyles = `
