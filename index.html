@@ -346,22 +346,22 @@
   pointer-events: none;
 }
 
-/* Splash Screen Styles */
+/* Splash Screen Styles - UPDATED WITH RANDOM BACKGROUNDS */
 #splash-screen {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url('https://i.ibb.co/jPSZTK7N/Grid-Art-20251102-171849001.jpg');
-  background-size: 100% 100%; /* ပုံကို အပြည့်ပြသ */
+  background-size: cover;
   background-position: center;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* အောက်ဘက်သို့ချ */
+  justify-content: flex-end;
   align-items: center;
-  padding-bottom: 80px; /* အောက် margin */
+  padding-bottom: 80px;
   z-index: 9999;
+  transition: background-image 0.5s ease-in-out;
 }
 
 /* လည်နေသော အဝိုင်း (သေး version) */
@@ -4082,6 +4082,27 @@ menuButtons.addEventListener('click', (e) => {
   e.stopPropagation();
 });
 
+
+// ===== RANDOM SPLASH SCREEN BACKGROUNDS =====
+const splashBackgrounds = [
+  'https://iili.io/KpGGsAF.jpg',
+  'https://iili.io/KpGVCXa.jpg', 
+  'https://iili.io/KpGVD2p.jpg',
+  'https://iili.io/KpGXdAP.jpg',
+  'https://iili.io/KpGXv5B.jpg',
+  'https://iili.io/KpGh1EJ.jpg'
+];
+
+// Function to set random splash background
+function setRandomSplashBackground() {
+  const splashScreen = document.getElementById('splash-screen');
+  if (splashScreen) {
+    const randomIndex = Math.floor(Math.random() * splashBackgrounds.length);
+    splashScreen.style.backgroundImage = `url('${splashBackgrounds[randomIndex]}')`;
+    console.log('Set random splash background:', splashBackgrounds[randomIndex]);
+  }
+}
+
 // ===== NEW SPLASH SCREEN CODE =====
 document.addEventListener('DOMContentLoaded', function() {
     const splashScreen = document.getElementById('splash-screen');
@@ -4089,6 +4110,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const countdownText = document.getElementById('countdown-text');
     const enterBtn = document.getElementById('enter-btn');
     const bgMusic = document.getElementById('bg-music');
+
+    // Set random background when page loads
+    setRandomSplashBackground();
 
     // Main Screen ကို စတင်တဲ့အခါ ဖျောက်ထားမယ်
     if (mainScreen) {
@@ -4132,6 +4156,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+
+
+  
 // ===== SUPABASE CONFIGURATION (FOUR SERVERS WITH 300 USER LIMIT EACH) =====
 const SUPABASE_SERVERS = {
   server1: {
