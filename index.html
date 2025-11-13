@@ -7774,7 +7774,7 @@ function handleLuckyAction() {
     startLuckySpin();
   } else {
     // No tries left but still in cooldown
-    alert('ဖောက်ခွင့်မရှိပါ! ' + formatTime(LUCKY_COOLDOWN - timePassed) + ' ကြာမှ ထပ်ဖောက်နိုင်မည်။');
+    alert('ကံစမ်းခွင့်မရှိပါ! ' + formatTime(LUCKY_COOLDOWN - timePassed) + ' ကြာမှထပ်ကံစမ်းနိုင်မည်။');
   }
 }
 
@@ -7795,14 +7795,14 @@ function shareForLuckyDraw() {
   
   // Show success message after short delay
   setTimeout(() => {
-    alert('Share ပြီးပါပြီ! ဖောက်ခွင့် 3 ခါရရှိပါပြီ။\nယခုဖောက်နိုင်ပါပြီ။');
+    alert('Share ပြီးပါပြီ! ကံစမ်းခွင့် 3 ခါရရှိပါပြီ။\nကံစမ်းနိုင်ပါပြီ။');
   }, 1000);
 }
 
 // Start Lucky Spin
 function startLuckySpin() {
   if (luckyTries <= 0) {
-    alert('ဖောက်ခွင့်မရှိပါ!');
+    alert('ကံစမ်းခွင့်မရှိပါ!');
     return;
   }
   
@@ -7974,8 +7974,8 @@ function updateLuckyDrawDisplay() {
   } else if (hasShared && luckyTries > 0) {
     // Can spin - Green Spin Button
     luckyCenterBtn.innerHTML = `
-      <div style="color: white; font-size: 14px; font-weight: bold; margin-bottom: 4px;">ဖောက်မည်</div>
-      <div style="color: #90ee90; font-size: 10px; text-align: center;">ဖောက်ခွင့် ${luckyTries} ကြိမ်<br>ကျန်ရှိ</div>
+      <div style="color: white; font-size: 14px; font-weight: bold; margin-bottom: 4px;"></div>
+      <div style="color: #90ee90; font-size: 10px; text-align: center;">ကံစမ်းခွင့် ${luckyTries} <br>ခါကျန်ရှိ</div>
     `;
     luckyCenterBtn.style.background = 'rgba(40, 167, 69, 0.9)';
     luckyCenterBtn.style.border = '3px solid rgba(255,255,255,0.5)';
