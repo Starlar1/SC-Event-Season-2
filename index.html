@@ -2434,7 +2434,7 @@ body {
     </button>
     <div class="sidebar-buttons" id="sidebar-buttons">
       <button class="sidebar-btn" id="event-btn">
-        <span>Event သို့</span>
+        <span>Coins Box</span>
       </button>
       <button class="sidebar-btn" id="task-btn">
         <span>Task များ</span>
@@ -3401,7 +3401,7 @@ body {
       <div class="task-info">
         <h3>Telegram က မိတ်ဆွေများစီ ၃ ခါ Share ပါ</h3>
         <p>MLBB Diamonds များကို အခမဲ့ ရယူရန် Event တွင်ပါဝင်လိုက်ပါ 💎</p>
-        <p>https://starlar1.github.io/Event1/</p>
+        <p>https://starlar1.github.io/SC-Event-Season-2/</p>
         <div class="task-reward">
           <img src="https://i.ibb.co/Vcf7pp94/Grid-Art-20251112-131617151.png" alt="Token">
           <span>3 Token Card</span>
@@ -3444,7 +3444,7 @@ body {
   <div class="task-info">
     <h3>သူငယ်ချင်းများစီ ၁၀ ခါ Share ပါ</h3>
     <p>MLBB Diamonds များကို အခမဲ့ ရယူရန် Event တွင်ပါဝင်လိုက်ပါ 💎</p>
-    <p>https://starlar1.github.io/Event1/</p>
+    <p>https://starlar1.github.io/SC-Event-Season-2/</p>
     <div class="task-reward">
       <img src="https://i.ibb.co/Vcf7pp94/Grid-Art-20251112-131617151.png" alt="Token">
       <span>5 Token Card</span>
@@ -3467,31 +3467,31 @@ body {
         <!-- Existing items -->
         <div class="exchange-card">
           <img src="https://iili.io/KGldYUG.jpg">
-          <p>5 Diamond - 4500 Coin လဲမရတော့ပါ</p>
+          <p>5 Diamond - 4500 Coin - 20 ယောက်သာလဲနိုင်</p>
           <button class="btn exchange-item" data-diamond="5" data-coins="4500">လဲမရသေးပါ</button>
         </div>
         <div class="exchange-card">
           <img src="https://iili.io/KGlFqle.jpg">
-          <p>11 Diamond - 8000 Coin လဲမရတော့ပါ</p>
+          <p>11 Diamond - 8000 Coin - 11 ယောက်သာလဲနိုင်</p>
           <button class="btn exchange-item" data-diamond="11" data-coins="8000">လဲမရသေးပါ</button>
         </div>
         <div class="exchange-card">
           <img src="https://iili.io/KGlfSK7.jpg">
-          <p>50 + 50 Diamond - လဲမရသေးပါ</p>
+          <p>50 + 50 Diamond - 1 ယောက်သာလဲနိုင်</p>
           <button class="btn exchange-item" data-diamond="100" data-coins="20000">လဲမရသေးပါ</button>
         </div>
         
                <!-- NEW: Wp Pass Item -->
         <div class="exchange-card">
           <img src="https://iili.io/KjVZcW7.jpg">
-          <p>Wp Pass - 35000 Coin 1 ယောက်သာလဲနိုင်</p>
+          <p>Wp Pass - 35000 Coin - 2 ယောက်သာလဲနိုင်</p>
           <button class="btn exchange-item" data-diamond="0" data-coins="35000" data-item="Wp Pass">လဲမည်</button>
         </div>
 
         <!-- Exchange Screen ထဲက exchange-cards div အတွင်း -->
 <div class="exchange-card">
   <img src="https://i.ibb.co/JWN4S2gf/Grid-Art-20251112-174154408.jpg" alt="Starlight">
-  <p>Starlight - 50000 Coin 1 ယောက်သာလဲနိုင်</p>
+  <p>Starlight - 50000 Coin - 1 ယောက်သာလဲနိုင်</p>
   <button class="btn exchange-item" data-diamond="0" data-coins="50000" data-item="Starlight">လဲမည်</button>
 </div>
         
@@ -4234,7 +4234,7 @@ btnStarlarStudio.addEventListener('click', () => {
   btnShare.addEventListener('click', () => {
     if (completedTasks['share']) return;
     // open Telegram share intent
-    window.open('https://t.me/share/url?url=https://starlar1.github.io/Event1/&text=MLBB Diamonds များကို အခမဲ့ရယူရန် Event တွင်ပါဝင်လိုက်ပါ 💎', '_blank');
+    window.open('https://t.me/share/url?url=https://starlar1.github.io/SC-Event-Season-2/&text=MLBB Diamonds များကို အခမဲ့ရယူရန် Event တွင်ပါဝင်လိုက်ပါ 💎', '_blank');
     shareCount++;
     localStorage.setItem('shareCount', shareCount);
     if (shareCount >= 3) {
@@ -4298,7 +4298,7 @@ btnShare10.addEventListener('click', () => {
   if (completedTasks['share10']) return;
   
   // open Telegram share intent
-  window.open('https://t.me/share/url?url=https://starlar1.github.io/Event1/&text=MLBB Diamonds များကို အခမဲ့ရယူရန် Event တွင်ပါဝင်လိုက်ပါ 💎', '_blank');
+  window.open('https://t.me/share/url?url=https://starlar1.github.io/SC-Event-Season-2/&text=MLBB Diamonds များကို အခမဲ့ရယူရန် Event တွင်ပါဝင်လိုက်ပါ 💎', '_blank');
   
   share10Count++;
   localStorage.setItem('share10Count', share10Count);
@@ -4327,7 +4327,7 @@ btnShare10.addEventListener('click', () => {
     const coinCost = this.getAttribute('data-coins');
 
     if(coins < coinCost) {
-      alert('Coin Card မလုံလောက်ပါ!');
+      alert('Coin မလုံလောက်ပါ!');
       return;
     }
 
@@ -4393,10 +4393,13 @@ function sendToTelegram(gameId, serverId, diamond, coinCost, itemName) {
 
   // ပြောင်းမယ့်စာများ
   const chatTexts = [
-    "Event ကနေ Diamonds တွေရယူလိုက်ပါ 💜",
+    "သိထားစရာ‌တွေပြောပြပါမယ် 🩵",
     "Token များရရှိရန် Tasks များလုပ်ပါ ",
-    "လူသုံးများအောင် Share ပေးပါအုန်း",
-    "နင်မလားချစ်သူမရှိတာ 😹 ",
+    "Token ဖြင့် Coins Box ထဲမှာ Coins ရယူပါ",
+    "Token များကို Token Box ကနေလဲယူနိုင် ",
+    "Coins နဲ့ Diamonds လဲလို့ရပါတယ် ",
+    "လဲတဲ့အခါ လဲရသေးလားဆိုတာသေချာစစ်ပါ",
+    "နင်မလားချစ်သူမရှိတာ 😹 ",    
     "ပြန်မလာတဲ့သူကို စောင့်မနေပါနဲ့လား 💔"
   ];
 
@@ -4523,9 +4526,9 @@ setInterval(updateBattleDisplay, 30000);
 // Exchange Chat Typing Text (Home style)
 const exchangeTexts = [
   `Coin ဖြင့် လဲမည်ဆို နှိပ်ပါ <span class="exchange-link" id="exchangeLink">လဲမည်</span> ❤️ `,
-  `Wp Pass ကို Coin 35000 နဲ့လဲလို့ရတယ်နော် 💜`,
+  `Starlight ကို Coins 50000 နဲ့လဲလို့ရတယ်နော် 💜`,
   `လဲဖို့ Coin မလောက်ရင် Tasks များနှင့် Token Box ကယူပါ 💛`,
-  `ယခု Event ကိုထုတ်သူက @Starlar1 ပါ သူ့စီ အလုပ်ကိစ ပြောလို့ရပါတယ် 🩵 `
+  `ယခု Event ကိုထုတ်သူက @Starlar1 ပါသူ့စီကြေညာအပ်လို့ရပါတယ် 🩵 `
 ];
 
 const exchangeChatText = document.getElementById("exchange-chat-text");
@@ -8047,7 +8050,7 @@ function handleLuckyAction() {
     startLuckySpin();
   } else {
     // No tries left but still in cooldown
-    alert('ဖောက်ခွင့်မရှိပါ! ' + formatTime(LUCKY_COOLDOWN - timePassed) + ' ကြာမှ ထပ်ဖောက်နိုင်မည်။');
+    alert('ကံစမ်းခွင့်မရှိပါ! ' + formatTime(LUCKY_COOLDOWN - timePassed) + ' ကြာမှ ထပ်ဖောက်နိုင်မည်။');
   }
 }
 
@@ -8068,14 +8071,14 @@ function shareForLuckyDraw() {
   
   // Show success message after short delay
   setTimeout(() => {
-    alert('Share ပြီးပါပြီ! ဖောက်ခွင့် 3 ခါရရှိပါပြီ။\nယခုဖောက်နိုင်ပါပြီ။');
+    alert('Share ပြီးပါပြီ! ကံစမ်းခွင့် 3 ခါရရှိပါပြီ။\nယခုကံစမ်းနိုင်ပါပြီ။');
   }, 1000);
 }
 
 // Start Lucky Spin
 function startLuckySpin() {
   if (luckyTries <= 0) {
-    alert('ဖောက်ခွင့်မရှိပါ!');
+    alert('ကံစမ်းခွင့်မရှိပါ!');
     return;
   }
   
@@ -8240,15 +8243,15 @@ function updateLuckyDrawDisplay() {
     // Need to share - Orange Share Button
     luckyCenterBtn.innerHTML = `
       <div style="color: white; font-size: 14px; font-weight: bold; margin-bottom: 4px;">Share ပါ</div>
-      <div style="color: #ffcc00; font-size: 10px; text-align: center;">Share ပြီးမှ<br>ဖောက်နိုင်မည်</div>
+      <div style="color: #ffcc00; font-size: 10px; text-align: center;">Share ပြီးမှ<br>ကံစမ်းနိုင်မည်</div>
     `;
-    luckyCenterBtn.style.background = 'rgba(255, 86, 0, 0.9)';
+    luckyCenterBtn.style.background = 'rgba(0, 123, 255, 0.9)';
     luckyCenterBtn.style.border = '3px solid rgba(255,255,255,0.5)';
   } else if (hasShared && luckyTries > 0) {
     // Can spin - Green Spin Button
     luckyCenterBtn.innerHTML = `
-      <div style="color: white; font-size: 14px; font-weight: bold; margin-bottom: 4px;">ဖောက်မည်</div>
-      <div style="color: #90ee90; font-size: 10px; text-align: center;">ဖောက်ခွင့် ${luckyTries} ကြိမ်<br>ကျန်ရှိ</div>
+      <div style="color: white; font-size: 14px; font-weight: bold; margin-bottom: 4px;">ကံစမ်းမည်</div>
+      <div style="color: #90ee90; font-size: 10px; text-align: center;">ကံစမ်းခွင့် ${luckyTries} ကြိမ်<br>ကျန်ရှိ</div>
     `;
     luckyCenterBtn.style.background = 'rgba(40, 167, 69, 0.9)';
     luckyCenterBtn.style.border = '3px solid rgba(255,255,255,0.5)';
