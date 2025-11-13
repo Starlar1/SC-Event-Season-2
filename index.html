@@ -2067,10 +2067,59 @@ body {
   }
 }
 
-/* Lucky Draw Styles */
+/* Lucky Draw Screen - Android Optimized */
+#lucky-draw-screen {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://i.ibb.co/xSpvxSdk/6bad88b1274536d836ea63a329b7fc33.jpg');
+  background-size: cover;
+  background-position: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  color: white;
+  padding: 15px;
+}
+
+/* Lucky Draw Content Container */
+.lucky-draw-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 10px 0;
+  width: 100%;
+}
+
+/* Lucky Draw Grid - Android Friendly */
+.lucky-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 320px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Lucky Items - Touch Friendly */
 .lucky-item {
+  background: rgba(0,0,0,0.7);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  border: 2px solid rgba(255,255,255,0.3);
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
-  cursor: default;
+  cursor: pointer;
+  min-height: 90px;
 }
 
 .lucky-item:hover {
@@ -2079,14 +2128,238 @@ body {
   border-color: rgba(255,255,255,0.6) !important;
 }
 
-#lucky-spin-btn:hover {
+.lucky-item img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 5px;
+  object-fit: contain;
+}
+
+.lucky-item-name {
+  font-size: 11px;
+  color: gold;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.lucky-item-value {
+  font-size: 10px;
+  color: #90ee90;
+}
+
+/* Center Button - Android Touch Optimized */
+#lucky-center-btn {
+  background: rgba(255, 86, 0, 0.9);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  border: 3px solid rgba(255,255,255,0.5);
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 90px;
+}
+
+#lucky-center-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 25px rgba(0,123,255,0.4);
 }
 
-#lucky-share-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(255,86,0,0.4);
+.center-btn-text {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.center-btn-subtext {
+  color: #ffcc00;
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Info Section */
+.lucky-info {
+  margin-top: 20px;
+  background: rgba(0,0,0,0.7);
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+}
+
+.lucky-tries {
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #ffcc00;
+}
+
+.lucky-instruction {
+  font-size: 11px;
+  color: #ddd;
+  margin-bottom: 6px;
+}
+
+.lucky-cooldown {
+  font-size: 11px;
+  color: #ddd;
+}
+
+/* Result Popup - Centered */
+#lucky-result {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
+  z-index: 2000;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.result-container {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  max-width: 280px;
+  width: 90%;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.result-title {
+  color: #ffcc00;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+#result-img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 12px;
+  object-fit: contain;
+}
+
+#result-text {
+  font-size: 16px;
+  color: white;
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+/* Back Button - Android Style */
+#back-lucky-draw {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  z-index: 5;
+}
+
+#back-lucky-draw:hover {
+  background: #0056b3;
+}
+
+#back-lucky-draw::before {
+  content: '←';
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+/* Responsive Design for Different Screen Sizes */
+@media (max-width: 480px) {
+  .lucky-grid {
+    max-width: 280px;
+    gap: 6px;
+  }
+  
+  .lucky-item {
+    padding: 8px;
+    min-height: 80px;
+  }
+  
+  .lucky-item img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .lucky-item-name {
+    font-size: 10px;
+  }
+  
+  .lucky-item-value {
+    font-size: 9px;
+  }
+  
+  .center-btn-text {
+    font-size: 13px;
+  }
+  
+  .center-btn-subtext {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  .lucky-grid {
+    max-width: 250px;
+    gap: 4px;
+  }
+  
+  .lucky-item {
+    padding: 6px;
+    min-height: 70px;
+  }
+  
+  .lucky-item img {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* Touch Feedback for Android */
+.lucky-item:active,
+#lucky-center-btn:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Loading State */
+.lucky-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Selected Item Animation */
+.lucky-item.selected {
+  border-color: gold !important;
+  box-shadow: 0 0 15px gold;
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 </style>
 </head>
@@ -4413,35 +4686,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   
-// ===== SUPABASE CONFIGURATION (FOUR SERVERS WITH 300 USER LIMIT EACH) =====
+// ===== SUPABASE CONFIGURATION =====
 const SUPABASE_SERVERS = {
   server1: {
     url: 'https://nrkthuuevjhhxwkhtcea.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ya3RodXVldmpoaHh3a2h0Y2VhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4OTQyNDMsImV4cCI6MjA3NzQ3MDI0M30.lFhuekPUyi58i6FR84YydZdvzYaqrCEL4uAWJLjPBqQ',
     maxUsers: 300,
     enabled: true,
-    newUsers: false  // ✅ CHANGED: Server 1 ကို new users အတွက်ပိတ်လိုက်ပါ
+    newUsers: true
   },
   server2: {
     url: 'https://bpstyyndguvfluwswctb.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwc3R5eW5kZ3V2Zmx1d3N3Y3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MTgxNjcsImV4cCI6MjA3NzM5NDE2N30.p9epvaIEnqoPEoCzfhwAjJjBTpeXlSAO51zH8NnVOIY',
     maxUsers: 300,
     enabled: true,
-    newUsers: false
+    newUsers: true
   },
   server3: {
     url: 'https://lgqxdvvjovqtuxdahupk.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxncXhkdnZqb3ZxdHV4ZGFodXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4MjcxNjksImV4cCI6MjA3NzQwMzE2OX0.kl1LVF1nv5N1qw-TEEZwYwmwYOlwnHEHDXscI-23uUU',
     maxUsers: 300,
     enabled: true,
-    newUsers: false
+    newUsers: true
   },
   server4: {
     url: 'https://ydqmtegtlwtadqevptfi.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkcW10ZWd0bHd0YWRxZXZwdGZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5ODM5NTcsImV4cCI6MjA3NzU1OTk1N30.Inb5ttutkulTo3ACreVjYkXx1rp-pxGRnBs2k7TX3CQ',
     maxUsers: 300,
     enabled: true,
-    newUsers: true  // ✅ Server 4 ကသာ new users အတွက်ဖွင့်ထားဆဲ
+    newUsers: true
   }
 };
 // Server selection variables
