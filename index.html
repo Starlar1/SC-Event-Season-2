@@ -7281,24 +7281,27 @@ class DownloadManager {
     loadImageList() {
         // NEW: Loading Photo တွေကို ပြောင်းလိုက်ပါပြီ
         this.downloadQueue = [
-            { url: 'https://iili.io/KOZgBK7.jpg', name: 'Login BG' },
-            { url: 'https://i.ibb.co/VcSpHZt2/Grid-Art-20251112-104128310.jpg', name: 'Main BG' },
-            { url: 'https://i.ibb.co/sdtSK7r9/Grid-Art-20251112-103216085.jpg', name: 'Event BG' },
-            { url: 'https://i.ibb.co/0HXNx0D/Grid-Art-20251112-104341468.jpg', name: 'Exchange BG' },
-            { url: 'https://iili.io/KOZNH0J.jpg', name: 'Rank BG' },
-            { url: 'https://i.ibb.co/spwHMt08/Grid-Art-20251023-165052122.jpg', name: 'Game BG' },
-            { url: 'https://i.ibb.co/7d0ZQwSQ/26af0e228da2cdf8b5af4425313603a8.jpg', name: 'Pumpkin BG' },
-            { url: 'https://i.ibb.co/xSpvxSdk/6bad88b1274536d836ea63a329b7fc33.jpg', name: 'Lucky Draw BG' },
-            { url: 'https://i.ibb.co/ynDJrr2m/Grid-Art-20251112-102809041.jpg', name: 'Token Box BG' },
-            
-            // NEW: Loading Background Photos (သင့်ပေးတဲ့ link တွေ)
-            { url: 'https://i.ibb.co/4nnScKxX/Grid-Art-20251112-135651767.jpg', name: 'Loading BG 1' },
-            { url: 'https://i.ibb.co/mCHLTZkV/Grid-Art-20251112-140950728.jpg', name: 'Loading BG 2' },
-            { url: 'https://i.ibb.co/HfqcCcyQ/Grid-Art-20251112-141037793.jpg', name: 'Loading BG 3' },
-            { url: 'https://i.ibb.co/HL1LSSs6/Grid-Art-20251112-141111863.jpg', name: 'Loading BG 4' },
-            { url: 'https://i.ibb.co/pSF568B/Grid-Art-20251112-141142692.jpg', name: 'Loading BG 5' },
-            { url: 'https://i.ibb.co/0VpVdRnj/Grid-Art-20251112-141507696.jpg', name: 'Loading BG 6' }
-        ];
+    { url: 'https://iili.io/KOZgBK7.jpg', name: 'Login BG' },
+    { url: 'https://i.ibb.co/VcSpHZt2/Grid-Art-20251112-104128310.jpg', name: 'Main BG' },
+    { url: 'https://i.ibb.co/sdtSK7r9/Grid-Art-20251112-103216085.jpg', name: 'Event BG' },
+    { url: 'https://i.ibb.co/0HXNx0D/Grid-Art-20251112-104341468.jpg', name: 'Exchange BG' },
+    { url: 'https://iili.io/KOZNH0J.jpg', name: 'Rank BG' },
+    { url: 'https://i.ibb.co/spwHMt08/Grid-Art-20251023-165052122.jpg', name: 'Game BG' },
+    { url: 'https://i.ibb.co/7d0ZQwSQ/26af0e228da2cdf8b5af4425313603a8.jpg', name: 'Pumpkin BG' },
+    { url: 'https://i.ibb.co/xSpvxSdk/6bad88b1274536d836ea63a329b7fc33.jpg', name: 'Lucky Draw BG' },
+    { url: 'https://i.ibb.co/ynDJrr2m/Grid-Art-20251112-102809041.jpg', name: 'Token Box BG' },
+    
+    // ✅ NEW: FAQ Rules Screen BG ဒီမှာထည့်ပါ
+    { url: 'https://i.ibb.co/HTzsRGwb/In-Shot-20251115-104715144.jpg', name: 'FAQ Rules BG' },
+    
+    // Loading Background Photos
+    { url: 'https://i.ibb.co/4nnScKxX/Grid-Art-20251112-135651767.jpg', name: 'Loading BG 1' },
+    { url: 'https://i.ibb.co/mCHLTZkV/Grid-Art-20251112-140950728.jpg', name: 'Loading BG 2' },
+    { url: 'https://i.ibb.co/HfqcCcyQ/Grid-Art-20251112-141037793.jpg', name: 'Loading BG 3' },
+    { url: 'https://i.ibb.co/HL1LSSs6/Grid-Art-20251112-141111863.jpg', name: 'Loading BG 4' },
+    { url: 'https://i.ibb.co/pSF568B/Grid-Art-20251112-141142692.jpg', name: 'Loading BG 5' },
+    { url: 'https://i.ibb.co/0VpVdRnj/Grid-Art-20251112-141507696.jpg', name: 'Loading BG 6' }
+];
 
         this.totalImages = this.downloadQueue.length;
         if (this.elements.totalImages) {
