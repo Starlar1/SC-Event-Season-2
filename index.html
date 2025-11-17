@@ -9036,9 +9036,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <button class="back-btn" id="back-my-shop" style="position: absolute; top: 20px; left: 20px; padding: 8px 16px; font-size: 14px; border: none; border-radius: 6px; background: #007bff; color: white; cursor: pointer; display: flex; align-items: center;">← Home</button>
             
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
-                <h2 style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">My Shop</h2>
+                <h2 style="font-size: 28px; margin-bottom: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Online Shop </h2>
                 
-                <div id="shop-phone" style="position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 180px; height: 350px; background-image: url('https://i.ibb.co/C3J7kfsL/Grid-Art-20251117-165725417.png'); background-size: contain; background-repeat: no-repeat; background-position: center; cursor: pointer; transition: transform 0.3s ease;">
+                <div id="shop-phone" style="position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 180px; height: 350px; background-image: url('https://i.ibb.co/TMF5rZQS/Grid-Art-20251117-200007529.png'); background-size: contain; background-repeat: no-repeat; background-position: center; cursor: pointer; transition: transform 0.3s ease;">
                     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; font-size: 14px;">
                         ဖုန်းကိုနှိပ်ပါ
                     </div>
@@ -9154,7 +9154,7 @@ const aiCustomers = [
     },
     {
         id: 8,
-        name: "Chou Pro Play",
+        name: "Chou Pro Lay",
         avatar: "https://i.ibb.co/Cs7vjgts/Grid-Art-20251117-165518430.jpg",
         behavior: "free_only"
     }
@@ -9216,7 +9216,7 @@ function updateShopLimitDisplay() {
     if (remainingSales > 0) {
         limitDisplay.innerHTML = `ကျန်ရှိသော ရောင်းခွင့်: <span style="color: #90ee90;">${remainingSales}/${SHOP_LIMIT_COUNT}</span> ယောက်`;
     } else {
-        limitDisplay.innerHTML = `❌ ဆိုင်ပိတ်ရမည် - ၅ ယောက်ပြည့်သွားပြီ`;
+        limitDisplay.innerHTML = ` ဆိုင်ပိတ်ရမည် - ၅ ယောက်ပြည့်သွားပြီ`;
     }
 }
 
@@ -9334,7 +9334,7 @@ function startNextCustomer() {
     
     // Check if reached limit
     if (shopSalesCount >= SHOP_LIMIT_COUNT) {
-        addShopMessage('system', '❌ ဆိုင်ပိတ်ရမည် - ၅ ယောက်ပြည့်သွားပြီ။ ၃ နာရီကြာမှ ထပ်ဖွင့်နိုင်ပါမည်။');
+        addShopMessage('system', ' ဆိုင်ပိတ်ရမည် - ၅ ယောက်ပြည့်သွားပြီ။ ၃ နာရီကြာမှ ထပ်ဖွင့်နိုင်ပါမည်။');
         document.getElementById('shop-action-buttons').style.display = 'none';
         return;
     }
@@ -9439,7 +9439,7 @@ function processFreeRequest(customer, willGive) {
         // DEDUCT SALES COUNT WHEN REFUSING TO GIVE FREE ITEM
         shopSalesCount++;
         localStorage.setItem('shopSalesCount', shopSalesCount);
-        addShopMessage('system', '❌ အလကားမပေးသည့်အတွက် ရောင်းခွင့် ၁ ခါ ကုန်သွားပါသည်။');
+        addShopMessage('system', ' အလကားမပေးခဲ့ပါ ရောင်းခွင့် ၁ ခါ ကုန်သွားပါသည်။');
         
         // Update shop limit display
         updateShopLimitDisplay();
@@ -9449,7 +9449,7 @@ function processFreeRequest(customer, willGive) {
         return;
     }
     
-    addShopMessage('bot', 'အော်... အလကားတောင်းနေတာလား? ဒီမှာ 11 Diamonds အလကားပေးမယ်!');
+    addShopMessage('bot', 'အလကားတောင်းနေတာလား? ဒီမှာ 11 Diamonds အလကားပေးမယ်!');
     
     // Check if user has enough coins
     const item = shopItems['11diamonds'];
@@ -9469,7 +9469,7 @@ function processFreeRequest(customer, willGive) {
     shopSalesCount++;
     localStorage.setItem('shopSalesCount', shopSalesCount);
     
-    addShopMessage('bot', `ဟုတ်ကဲ့! 11 Diamonds အလကားပေးလိုက်ပြီ။ ကျွန်တော် ${item.basePrice} Coins အကုန်ခံပြီးပေးလိုက်ရတယ်!`);
+    addShopMessage('bot', `11 Diamonds အလကားပေးလိုက်ပြီ။ ကျွန်တော် ${item.basePrice} Coins အကုန်ခံပြီးပေးလိုက်ရတယ်!`);
     
     // Update shop limit display
     updateShopLimitDisplay();
@@ -9580,7 +9580,7 @@ function confirmPrice(item, customer) {
     
     // Check if reached limit
     if (shopSalesCount >= SHOP_LIMIT_COUNT) {
-        addShopMessage('system', '❌ ဆိုင်ပိတ်ရမည် - ၅ ယောက်ပြည့်သွားပြီ။');
+        addShopMessage('system', ' ဆိုင်ပိတ်ရမည် - ၅ ယောက်ပြည့်သွားပြီ။');
         document.getElementById('shop-action-buttons').style.display = 'none';
         return;
     }
@@ -9595,7 +9595,7 @@ function confirmPrice(item, customer) {
         // DEDUCT SALES COUNT WHEN CUSTOMER REFUSES
         shopSalesCount++;
         localStorage.setItem('shopSalesCount', shopSalesCount);
-        addShopMessage('system', '❌ ဈေးမတန်သည်ဟုဆိုကာ မဝယ်သဖြင့် ရောင်းခွင့် ၁ ခါ ကုန်သွားပါသည်။');
+        addShopMessage('system', ' ဈေးမတန်သည်ဟုဆိုကာ မဝယ်သဖြင့် ရောင်းခွင့် ၁ ခါ ကုန်သွားပါသည်။');
         
         // Update shop limit display
         updateShopLimitDisplay();
@@ -9636,7 +9636,7 @@ function cancelSell(customer) {
     // DEDUCT SALES COUNT WHEN USER CANCELS SELL
     shopSalesCount++;
     localStorage.setItem('shopSalesCount', shopSalesCount);
-    addShopMessage('system', '❌ မရောင်းတော့သည်ဟုဆုံးဖြတ်သဖြင့် ရောင်းခွင့် ၁ ခါ ကုန်သွားပါသည်။');
+    addShopMessage('system', ' မရောင်းတော့သည်ဟုဆုံးဖြတ်သဖြင့် ရောင်းခွင့် ၁ ခါ ကုန်သွားပါသည်။');
     
     // Update shop limit display
     updateShopLimitDisplay();
