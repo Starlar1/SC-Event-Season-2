@@ -8841,7 +8841,7 @@ function setupRulesEventListeners() {
     if (rulesChatText) {
         rulesChatText.addEventListener('click', function() {
             // If showing initial message, show questions
-            if (rulesChatText.textContent === "သိထားစရာများကို ကြည့်ရန်") {
+            if (rulesChatText.textContent === "သိထားစရာများကို ကြည့်ရန် နှိပ်ပါ") {
                 showQuestions();
             }
         });
@@ -8869,7 +8869,7 @@ function setupRulesEventListeners() {
 
 // Show initial message
 function showInitialMessage() {
-    const initialText = "သိထားစရာများကို ကြည့်ရန်";
+    const initialText = "သိထားစရာများကို ကြည့်ရန် နှိပ်ပါ";
     typeTextWithButton(rulesChatText, initialText);
     
     // Hide questions initially
