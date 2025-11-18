@@ -2556,71 +2556,71 @@ body {
 
 
 
-<!-- Server Selection Screen -->
+<!-- Server Selection Screen - UPDATED LAYOUT -->
 <div id="server-selection-screen" style="display: none; width: 100vw; height: 100vh; background-image: url('https://iili.io/KOZNH0J.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; position: fixed; top: 0; left: 0; z-index: 1000; overflow-y: auto; color: white; padding: 20px;">
   <button class="back-btn" id="back-server-selection">Home</button>
   
-  <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; text-align: center; padding-top: 50px;">
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; text-align: center;">
     
     <!-- Header Section (အပေါ်မှာအသေထား) -->
-    <div style="margin-bottom: 40px;">
-      <h2 style="font-size: 32px; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Select Server</h2>
-      <p style="font-size: 16px; opacity: 0.8; margin-bottom: 40px;">သင်ကြည့်မဲ့ Server ရွေးပါ</p>
+    <div style="margin-top: 40px; margin-bottom: 20px;">
+      <h2 style="font-size: 28px; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Select Server</h2>
+      <p style="font-size: 14px; opacity: 0.8;">သင်ကြည့်မဲ့ Server ရွေးပါ</p>
     </div>
 
     <!-- Server Grid (အောက်ကိုရွေ့) -->
-    <div class="server-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 400px; width: 100%; margin-top: auto; margin-bottom: 100px;">
+    <div class="server-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 400px; width: 100%; margin-top: 20px;">
       <!-- Server 1 -->
-      <div class="server-card" data-server="server1" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
+      <div class="server-card" data-server="server1" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
         <div style="font-size: 24px; margin-bottom: 10px;">🟢</div>
-        <h3 style="font-size: 20px; margin-bottom: 8px; color: #90ee90;">Server 1</h3>
+        <h3 style="font-size: 18px; margin-bottom: 8px; color: #90ee90;">Server 1</h3>
         <p style="font-size: 12px; opacity: 0.8; margin-bottom: 10px;">Rank ကြည့်မည်</p>
         <div style="font-size: 11px; color: #ffcc00;">Users: <span id="server1-count">Loading...</span></div>
       </div>
       
       <!-- Server 2 -->
-      <div class="server-card" data-server="server2" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
+      <div class="server-card" data-server="server2" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
         <div style="font-size: 24px; margin-bottom: 10px;">🟢</div>
-        <h3 style="font-size: 20px; margin-bottom: 8px; color: #ff6b6b;">Server 2</h3>
+        <h3 style="font-size: 18px; margin-bottom: 8px; color: #ff6b6b;">Server 2</h3>
         <p style="font-size: 12px; opacity: 0.8; margin-bottom: 10px;">Rank ကြည့်မည်</p>
         <div style="font-size: 11px; color: #ffcc00;">Users: <span id="server2-count">Loading...</span></div>
       </div>
       
       <!-- Server 3 -->
-      <div class="server-card" data-server="server3" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
+      <div class="server-card" data-server="server3" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
         <div style="font-size: 24px; margin-bottom: 10px;">🟢</div>
-        <h3 style="font-size: 20px; margin-bottom: 8px; color: #ff6b6b;">Server 3</h3>
+        <h3 style="font-size: 18px; margin-bottom: 8px; color: #ff6b6b;">Server 3</h3>
         <p style="font-size: 12px; opacity: 0.8; margin-bottom: 10px;">Rank ကြည့်မည်</p>
         <div style="font-size: 11px; color: #ffcc00;">Users: <span id="server3-count">Loading...</span></div>
       </div>
       
       <!-- Server 4 -->
-      <div class="server-card" data-server="server4" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
+      <div class="server-card" data-server="server4" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
         <div style="font-size: 24px; margin-bottom: 10px;">🟢</div>
-        <h3 style="font-size: 20px; margin-bottom: 8px; color: #90ee90;">Server 4</h3>
+        <h3 style="font-size: 18px; margin-bottom: 8px; color: #90ee90;">Server 4</h3>
         <p style="font-size: 12px; opacity: 0.8; margin-bottom: 10px;">Rank ကြည့်မည်</p>
         <div style="font-size: 11px; color: #ffcc00;">Users: <span id="server4-count">Loading...</span></div>
       </div>
 
       <!-- Server 5 -->
-      <div class="server-card" data-server="server5" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
+      <div class="server-card" data-server="server5" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
         <div style="font-size: 24px; margin-bottom: 10px;">🟢</div>
-        <h3 style="font-size: 20px; margin-bottom: 8px; color: #90ee90;">Server 5</h3>
+        <h3 style="font-size: 18px; margin-bottom: 8px; color: #90ee90;">Server 5</h3>
         <p style="font-size: 12px; opacity: 0.8; margin-bottom: 10px;">Rank ကြည့်မည်</p>
         <div style="font-size: 11px; color: #ffcc00;">Users: <span id="server5-count">Loading...</span></div>
       </div>
 
       <!-- Server 6 -->
-      <div class="server-card" data-server="server6" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 25px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
+      <div class="server-card" data-server="server6" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3); text-align: center;">
         <div style="font-size: 24px; margin-bottom: 10px;">🟢</div>
-        <h3 style="font-size: 20px; margin-bottom: 8px; color: #ff6b6b;">Server 6</h3>
+        <h3 style="font-size: 18px; margin-bottom: 8px; color: #ff6b6b;">Server 6</h3>
         <p style="font-size: 12px; opacity: 0.8; margin-bottom: 10px;">Rank ကြည့်မည်</p>
         <div style="font-size: 11px; color: #ffcc00;">Users: <span id="server6-count">Loading...</span></div>
       </div>
     </div>
 
     <!-- Note Section (အောက်ဆုံးမှာ) -->
-    <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; max-width: 400px; margin-bottom: 30px;">
+    <div style="background: rgba(0,0,0,0.5); padding: 12px; border-radius: 10px; max-width: 400px; margin-top: 20px; margin-bottom: 30px;">
       <p style="font-size: 12px; color: #ffcc00; margin: 0;">
         💡 <strong>Note:</strong> သင့် Server ကိုသိရန် Account Profile ထဲကြည့်ပါ.
       </p>
@@ -5468,17 +5468,25 @@ function clearRankData() {
   console.log('Rank data cleared completely');
 }
 
-// Load server user counts
+// Load server user counts - FIXED VERSION
 async function loadServerUserCounts() {
   try {
     const serverElements = {
       'server1': document.getElementById('server1-count'),
       'server2': document.getElementById('server2-count'),
       'server3': document.getElementById('server3-count'),
-      'server4': document.getElementById('server4-count')
+      'server4': document.getElementById('server4-count'),
+      'server5': document.getElementById('server5-count'), // ✅ ADD THIS
+      'server6': document.getElementById('server6-count')  // ✅ ADD THIS
     };
 
     for (const [serverId, element] of Object.entries(serverElements)) {
+      // Check if element exists
+      if (!element) {
+        console.error(`Element not found for ${serverId}`);
+        continue;
+      }
+      
       try {
         const tempSupabase = window.supabase.createClient(
           SUPABASE_SERVERS[serverId].url, 
@@ -5505,10 +5513,10 @@ async function loadServerUserCounts() {
           const statusText = serverCard.querySelector('p');
           
           if (isFull) {
-            statusIcon.textContent = '🟢';
-            statusText.innerHTML = '<span style="color: #ff6b6b;">Rank ကြည့်မည်</span>';
+            statusIcon.textContent = '🔴'; // Full server - red
+            statusText.innerHTML = '<span style="color: #ff6b6b;">Full</span>';
           } else {
-            statusIcon.textContent = '🟢';
+            statusIcon.textContent = '🟢'; // Available server - green
             statusText.innerHTML = '<span style="color: #90ee90;">Rank ကြည့်မည်</span>';
           }
         }
