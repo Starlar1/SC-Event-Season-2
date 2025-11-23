@@ -4759,64 +4759,63 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   
-// ===== SUPABASE CONFIGURATION =====
-// ===== SUPABASE CONFIGURATION =====
+
 // ===== SUPABASE CONFIGURATION =====
 const SUPABASE_SERVERS = {
   server1: {
     url: 'https://pedmvcvwqvqmfgdbureu.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlZG12Y3Z3cXZxbWZnZGJ1cmV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDczNzQsImV4cCI6MjA3ODY4MzM3NH0.zpZOlBOrxN1QfVKu9IrMf0ZqUzppYdZ9Q2pn0euEY2g',
     maxUsers: 100,
-    enabled: true,    // ✅ ရှိပြီးသား users အတွက်ဖွင့်ထား
+    enabled: true,    // ✅ Server 1 ကိုရှိပြီးသား users အတွက်ဖွင့်ထား
     newUsers: false   // ❌ အကောင့်သစ်ဖွင့်ခွင့်ပိတ်ထား
   },
   server2: {
     url: 'https://bfhmhojuthlhnltxffvn.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmaG1ob2p1dGhsaG5sdHhmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDc2MTksImV4cCI6MjA3ODY4MzYxOX0.lWu3Q_X1Y06tWTRhCjQDDo3m8QWqek-QU-bs2t1mo1w',
     maxUsers: 100,
-    enabled: true,    // ✅ ရှိပြီးသား users အတွက်ဖွင့်ထား
+    enabled: true,    // ✅ Server 2 ကိုရှိပြီးသား users အတွက်ဖွင့်ထား
     newUsers: false   // ❌ အကောင့်သစ်ဖွင့်ခွင့်ပိတ်ထား
   },
   server3: {
     url: 'https://dbuatkhuhtmlqfdhytit.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRidWF0a2h1aHRtbHFmZGh5dGl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDgxMzIsImV4cCI6MjA3ODY4NDEzMn0.Pm4Li-jpf15d9jb35R4wonvKPnkezWvkm47j6L1q0IQ',
     maxUsers: 100,
-    enabled: true,    // ✅ ရှိပြီးသား users အတွက်ဖွင့်ထား
+    enabled: true,    // ✅ Server 3 ကိုရှိပြီးသား users အတွက်ဖွင့်ထား
     newUsers: false   // ❌ အကောင့်သစ်ဖွင့်ခွင့်ပိတ်ထား
   },
   server4: {
     url: 'https://rxazguzipzxtxlwjgrlt.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ4YXpndXppcHp4dHhsd2pncmx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDgxODcsImV4cCI6MjA3ODY4NDE4N30.ylEMCYhUzvM0UR4KjKGiNQF54SVEOmK5r3ng7oeu_nc',
     maxUsers: 100,
-    enabled: true,    // ✅ ရှိပြီးသား users အတွက်ဖွင့်ထား
+    enabled: true,    // ✅ Server 4 ကိုရှိပြီးသား users အတွက်ဖွင့်ထား
     newUsers: false   // ❌ အကောင့်သစ်ဖွင့်ခွင့်ပိတ်ထား
   },
   server5: {
     url: 'https://qhymuppxnbzioryulfwg.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoeW11cHB4bmJ6aW9yeXVsZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDkzNjMsImV4cCI6MjA3ODY4NTM2M30.9rxMQuquFtMFKT4m9Eo4WVCWAWGwQDsof8l2csE3B8Q',
     maxUsers: 100,
-    enabled: true,    // ✅ ဖွင့်ထား
+    enabled: true,    // ✅ Server 5 ကိုဖွင့်ထားမယ်
     newUsers: true    // ✅ အကောင့်သစ်ဖွင့်ခွင့်ရှိ
   },
   server6: {
     url: 'https://nqhzlwwqkhzdxzsaitcf.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaHpsd3dxa2h6ZHh6c2FpdGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDk2MzQsImV4cCI6MjA3ODY4NTYzNH0.4Z_1-hXDC-KZffFDLUEHsryyzB8_1YdLJSQVmDBN-eE',
     maxUsers: 100,
-    enabled: true,    // ✅ ဖွင့်ထား
+    enabled: true,    // ✅ Server 6 ကိုဖွင့်ထားမယ်
     newUsers: true    // ✅ အကောင့်သစ်ဖွင့်ခွင့်ရှိ
   },
   server7: {
     url: 'https://vtytlhaiaehiwhhxxycn.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0eXRsaGFpYWVoaXdoaHh4eWNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3ODI4NjMsImV4cCI6MjA3OTM1ODg2M30.VdUQz1JdbHPGDR_4rFWfBn0zrma5UOFmn_w824oT450',
     maxUsers: 100,
-    enabled: true,    // ✅ ဖွင့်ထား
+    enabled: true,    // ✅ Server 7 ကိုဖွင့်ထားမယ်
     newUsers: true    // ✅ အကောင့်သစ်ဖွင့်ခွင့်ရှိ
   },
   server8: {
     url: 'https://ktmkdgxfzdxnppxwudjx.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0bWtkZ3hmemR4bnBweHd1ZGp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3ODMyNTQsImV4cCI6MjA3OTM1OTI1NH0.yrUzlWxbnyahquiYJUrjyY4-GSmWx582C44727zpwFI',
     maxUsers: 100,
-    enabled: true,    // ✅ ဖွင့်ထား
+    enabled: true,    // ✅ Server 8 ကိုဖွင့်ထားမယ်
     newUsers: true    // ✅ အကောင့်သစ်ဖွင့်ခွင့်ရှိ
   }
 };
