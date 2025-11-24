@@ -4794,34 +4794,35 @@ const SUPABASE_SERVERS = {
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoeW11cHB4bmJ6aW9yeXVsZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDkzNjMsImV4cCI6MjA3ODY4NTM2M30.9rxMQuquFtMFKT4m9Eo4WVCWAWGwQDsof8l2csE3B8Q',
     maxUsers: 100,
     enabled: true,
-    newUsers: true
+    newUsers: false
   },
   server6: {
     url: 'https://nqhzlwwqkhzdxzsaitcf.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaHpsd3dxa2h6ZHh6c2FpdGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxMDk2MzQsImV4cCI6MjA3ODY4NTYzNH0.4Z_1-hXDC-KZffFDLUEHsryyzB8_1YdLJSQVmDBN-eE',
     maxUsers: 100,
     enabled: true,
-    newUsers: true
+    newUsers: false
   },
   server7: {
     url: 'https://fchkjhwawufieogilute.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjaGtqaHdhd3VmaWVvZ2lsdXRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5Nzc2NzUsImV4cCI6MjA3OTU1MzY3NX0.nCfBPs3II0gpt4WdbiKmyp0KvZ9tw8GEQT9BrOpW_bo',
     maxUsers: 100,
     enabled: true,
-    newUsers: true
+    newUsers: true      // ✔ ONLY SERVER7 = TRUE 
   },
   server8: {
     url: 'https://kkwwkbjafncakldvyabm.supabase.co',
     key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtrd3drYmphZm5jYWtsZHZ5YWJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM5Nzc5MjQsImV4cCI6MjA3OTU1MzkyNH0.H9faoBbuwcSlfyJM80L-TySoqp209Fo8cLJlzRG3hQg',
     maxUsers: 100,
     enabled: true,
-    newUsers: true
+    newUsers: false
   }
 };
 
-
 // Server selection variables
-let currentServer = localStorage.getItem('currentServer') || 'server2';
+let currentServer = 'server7';  // ✔ DEFAULT SERVER7
+localStorage.setItem('currentServer', 'server7');
+
 let userCounts = JSON.parse(localStorage.getItem('userCounts')) || {
   server1: 0,
   server2: 0,
@@ -4829,8 +4830,8 @@ let userCounts = JSON.parse(localStorage.getItem('userCounts')) || {
   server4: 0,
   server5: 0,
   server6: 0,
-  server7: 0,  // ✅ NEW
-  server8: 0   // ✅ NEW
+  server7: 0,
+  server8: 0
 };
 
 // Initialize current Supabase client
