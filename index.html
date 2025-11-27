@@ -10352,8 +10352,6 @@ localAccountBtn.addEventListener('click', function() {
         mainScreen.style.display = 'block';
       }
       
-      console.log('✅ Local account loaded - All previous progress restored');
-      
     } catch (error) {
       console.error('Error loading local account:', error);
       alert('Local account ဖတ်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။');
@@ -10428,13 +10426,11 @@ function createLocalAccount() {
   if (mainScreen) {
     mainScreen.style.display = 'block';
   }
-  
-  alert(`Local account created!\nUser ID: ${userId}\n✅ All progress will be saved locally`);
 }
 
-// ===== MODIFIED USER LOADING - ALWAYS SHOW LOGIN SCREEN WITH EXISTING DATA =====
+// ===== MODIFIED USER LOADING - ALWAYS SHOW LOGIN SCREEN WITHOUT DISPLAYING DATA =====
 
-// Modified user loading to ALWAYS show login screen but keep existing data
+// Modified user loading to ALWAYS show login screen but don't display existing data
 document.addEventListener('DOMContentLoaded', async function() {
   const savedUser = localStorage.getItem('currentUser');
   const userServer = localStorage.getItem('userServer');
@@ -10448,15 +10444,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       
       // Check if this is a local account
       if (currentUser.isLocalAccount) {
-        console.log('Existing Local account detected - Showing saved data');
-        
-        // Show existing user info with all saved data
-        showExistingUserInfo();
-        
-        // Update local account button to show it will load existing data
-        if (localAccountBtn) {
-          localAccountBtn.innerHTML = `My Local Acc ဝင်မည်<br><small>(${currentUser.displayName} - ရှိပြီးသား Data ပြန်ရမည်)</small>`;
-        }
+        // Just load the data, don't display anything
+        console.log('Existing Local account detected - Data ready for loading');
       } else {
         // For Supabase accounts
         console.log('Supabase account detected - Login screen shown');
@@ -10472,47 +10461,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('No saved account - Can create new local account');
   }
 });
-
-// Show existing user info with all saved data
-function showExistingUserInfo() {
-  if (currentUser && currentUser.isLocalAccount) {
-    const existingUserInfo = document.createElement('div');
-    existingUserInfo.className = 'existing-user-info';
-    
-    // Calculate completed tasks count
-    const completedTasksCount = Object.values(currentUser.completedTasks).filter(task => task === true).length;
-    const totalTasks = Object.keys(currentUser.completedTasks).length;
-    
-    existingUserInfo.innerHTML = `
-      <div style="background: rgba(255,193,7,0.2); padding: 12px; border-radius: 10px; margin: 10px 0; border: 1px solid rgba(255,193,7,0.5);">
-        <div style="font-size: 12px; color: #ffcc00; margin-bottom: 8px; font-weight: bold;">
-          ✅ ရှိပြီးသား Local Account တွေ့ရှိပါသည်
-        </div>
-        <div style="font-size: 11px; color: white; line-height: 1.4;">
-          <strong>User:</strong> ${currentUser.displayName}<br>
-          <strong>ID:</strong> ${currentUser.uid}<br>
-          <strong>Tokens:</strong> ${currentUser.tokens} | <strong>Coins:</strong> ${currentUser.coins} | <strong>Crystals:</strong> ${currentUser.crystals}<br>
-          <strong>Completed Tasks:</strong> ${completedTasksCount}/${totalTasks}<br>
-          <strong>Last Login:</strong> ${new Date(currentUser.lastLogin).toLocaleDateString()}
-        </div>
-        <div style="font-size: 10px; color: #90ee90; margin-top: 5px; font-style: italic;">
-          "My Local Acc ဝင်မည်" နှိပ်ပါက အထက်ပါ Data အားလုံးပြန်ရရှိမည်
-        </div>
-      </div>
-    `;
-    
-    const loginContainer = document.querySelector('.login-container');
-    const localBtn = document.getElementById('local-account-btn');
-    if (loginContainer && localBtn) {
-      // Remove existing info if any
-      const existingInfo = loginContainer.querySelector('.existing-user-info');
-      if (existingInfo) {
-        existingInfo.remove();
-      }
-      loginContainer.insertBefore(existingUserInfo, localBtn);
-    }
-  }
-}
 
 // ===== MODIFIED SAVE SYSTEM - ALL PROGRESS SAVED LOCALLY =====
 
@@ -10534,18 +10482,14 @@ async function saveUserData() {
 
     // ✅ ALWAYS save to localStorage (ရရှိထားသော အရာများကို local မှာသိမ်း)
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    console.log('💾 Local storage saved - Tokens:', currentUser.tokens, 'Coins:', currentUser.coins, 'Crystals:', currentUser.crystals);
     
     // Only save to Supabase if NOT a local account
     if (!currentUser.isLocalAccount) {
       try {
         await saveUserToSupabase(currentUser);
-        console.log('🌐 Supabase saved for online account');
       } catch (error) {
         console.error('Error saving to Supabase:', error);
       }
-    } else {
-      console.log('📱 Local account - All progress saved to device');
     }
   }
 }
@@ -10615,7 +10559,7 @@ function isLocalAccount() {
 // ❌ STRICTLY BLOCK EDIT PROFILE ONLY
 editProfileBtn.addEventListener('click', function() {
   if (isLocalAccount()) {
-    alert('❌ Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။\nကျေးဇူးပြု၍ Online Account ဖွင့်၍သုံးပါ။');
+    alert('❌ Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။');
     return;
   }
   
@@ -10649,7 +10593,7 @@ function overrideShareFunctions() {
       const originalClick = btn.onclick;
       btn.onclick = function() {
         if (isLocalAccount()) {
-          alert('❌ Local Account များသည် Share လုပ်ခွင့်မရှိပါ။\nကျေးဇူးပြု၍ Online Account ဖွင့်၍သုံးပါ။');
+          alert('❌ Local Account များသည် Share လုပ်ခွင့်မရှိပါ။');
           return;
         }
         if (originalClick) originalClick.call(this);
@@ -10686,7 +10630,7 @@ function generate10DigitId() {
   return randomId.toString();
 }
 
-// Initialize game with user data - RESTORE ALL EXISTING DATA
+// Initialize game with user data - RESTORE ALL EXISTING DATA SILENTLY
 function initializeGameWithUser(user) {
   // ✅ အရင် local ACC data ကိုပဲပြန်ရမယ် - အသစ်မဖြစ်ရ
   tokens = user.tokens || 0;
@@ -10700,7 +10644,7 @@ function initializeGameWithUser(user) {
   share10Count = user.share10Count || 0;
   currentUserFrame = user.frameId || 'default';
 
-  // Update UI with restored data
+  // Update UI with restored data (no alerts or displays)
   tokenCountElem.textContent = tokens;
   coinCountElem.textContent = coins;
   
@@ -10718,9 +10662,6 @@ function initializeGameWithUser(user) {
   
   // Save current state to localStorage (to confirm restoration)
   saveUserData();
-  
-  console.log('🎮 Game initialized - All previous data restored successfully');
-  console.log('📊 Restored Data - Tokens:', tokens, 'Coins:', coins, 'Crystals:', crystals);
 }
 
 // ===== AUTO-SAVE FEATURE =====
@@ -10729,7 +10670,6 @@ function initializeGameWithUser(user) {
 setInterval(function() {
   if (currentUser && currentUser.isLocalAccount) {
     saveUserData();
-    console.log('🔄 Auto-saved local account progress');
   }
 }, 30000);
 
@@ -10737,14 +10677,13 @@ setInterval(function() {
 window.addEventListener('beforeunload', function() {
   if (currentUser && currentUser.isLocalAccount) {
     saveUserData();
-    console.log('📤 Saved all local account progress before page close');
   }
 });
-
-console.log('🔧 Local Account System Loaded - Existing Data Always Restored, No New Accounts Created');
-    
   
 
+    
+
+        
 
 
 
