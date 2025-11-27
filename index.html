@@ -10320,7 +10320,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// ===== LOCAL ACCOUNT SYSTEM - COMPLETE =====
+// ===== LOCAL ACCOUNT SYSTEM - SHOW ONLY IN ACC OPEN =====
 
 // DOM Elements for Local Account
 const localAccountBtn = document.getElementById('local-account-btn');
@@ -10344,35 +10344,14 @@ function manageLocalButtonVisibility() {
   }
 }
 
-// Check if local data already exists
-function checkLocalDataExists() {
-  const savedUser = localStorage.getItem('currentUser');
-  if (savedUser) {
-    try {
-      const userData = JSON.parse(savedUser);
-      return userData.isLocalAccount === true;
-    } catch (error) {
-      return false;
-    }
-  }
-  return false;
-}
-
 // Local Account Button Click Event
 localAccountBtn.addEventListener('click', function() {
   const savedUser = localStorage.getItem('currentUser');
   
   if (savedUser) {
-    // Load existing local account - အရင် Data all ပြန်ရမယ်
+    // Load existing local account
     try {
       currentUser = JSON.parse(savedUser);
-      
-      // Check if this is a local account
-      if (!currentUser.isLocalAccount) {
-        alert('❌ Online Account ရှိပြီးသားဖြစ်နေပါသည်။ Local Account သုံးလို့မရပါ။');
-        return;
-      }
-      
       currentServer = currentUser.server || 'server2';
       localStorage.setItem('currentServer', currentServer);
       
@@ -10391,8 +10370,6 @@ localAccountBtn.addEventListener('click', function() {
         mainScreen.style.display = 'block';
       }
       
-      console.log('✅ Existing local account loaded - All previous data restored');
-      
     } catch (error) {
       console.error('Error loading local account:', error);
       alert('Local account ဖတ်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။');
@@ -10405,12 +10382,6 @@ localAccountBtn.addEventListener('click', function() {
 
 // Function to create local account (only when no existing data)
 function createLocalAccount() {
-  // Check if local data already exists
-  if (checkLocalDataExists()) {
-    alert('❌ Local Data ရှိပြီးသားဖြစ်နေပါသည်။ "My Local Acc ဝင်မည်" ကိုနှိပ်ပါ။');
-    return;
-  }
-  
   const userName = "Local User " + Math.floor(Math.random() * 10000);
   const userId = generate10DigitId();
   
@@ -10473,8 +10444,6 @@ function createLocalAccount() {
   if (mainScreen) {
     mainScreen.style.display = 'block';
   }
-  
-  console.log('✅ New local account created');
 }
 
 // ===== MODIFIED USER LOADING - MANAGE LOCAL BUTTON VISIBILITY =====
@@ -10710,9 +10679,9 @@ function generate10DigitId() {
   return randomId.toString();
 }
 
-// Initialize game with user data - RESTORE ALL PREVIOUS DATA
+// Initialize game with user data - SAVE ALL PROGRESS LOCALLY
 function initializeGameWithUser(user) {
-  // ✅ အရင် Data all ပြန်ရမယ်
+  // ✅ ရရှိထားသော အရာများကို local မှာသိမ်း
   tokens = user.tokens || 0;
   coins = user.coins || 0;
   crystals = user.crystals || 0;
@@ -10724,7 +10693,7 @@ function initializeGameWithUser(user) {
   share10Count = user.share10Count || 0;
   currentUserFrame = user.frameId || 'default';
 
-  // Update UI with all restored data
+  // Update UI
   tokenCountElem.textContent = tokens;
   coinCountElem.textContent = coins;
   
@@ -10734,7 +10703,7 @@ function initializeGameWithUser(user) {
     crystalCountElem.textContent = crystals;
   }
 
-  // Update task states with restored data
+  // Update task states
   updateTaskStates();
 
   // Start timer for 3-hour task
@@ -10745,8 +10714,6 @@ function initializeGameWithUser(user) {
   
   // Manage local button visibility
   manageLocalButtonVisibility();
-  
-  console.log('✅ All previous data restored - Tokens:', tokens, 'Coins:', coins, 'Crystals:', crystals);
 }
 
 // ===== AUTO-SAVE FEATURE =====
@@ -10816,7 +10783,9 @@ document.addEventListener('click', function() {
   setTimeout(manageLocalButtonVisibility, 100);
 });
 
-console.log('🔧 Local Account System Loaded - No Duplicate Local Data, All Data Restored on Login');
+console.log('🔧 Local Account System Loaded - Local Button Shows Only in ACC Open Screen');
+      
+
 
 
 
