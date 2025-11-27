@@ -10327,54 +10327,41 @@ const localAccountBtn = document.getElementById('local-account-btn');
 
 // Local Account Button Click Event
 localAccountBtn.addEventListener('click', function() {
-  // Check if there's a local account
   const savedUser = localStorage.getItem('currentUser');
   
   if (savedUser) {
     // Load existing local account
     try {
       currentUser = JSON.parse(savedUser);
-      
-      // Set current server from saved data or default
       currentServer = currentUser.server || 'server2';
       localStorage.setItem('currentServer', currentServer);
       
-      // Switch to appropriate Supabase client
       if (SUPABASE_SERVERS[currentServer] && SUPABASE_SERVERS[currentServer].enabled) {
         switchSupabaseClient(currentServer);
       } else {
-        // If saved server is disabled, use default
         switchSupabaseClient('server2');
       }
       
-      // Hide login screen
       loginScreen.style.display = 'none';
-      
-      // Update profile circle
       updateProfileCircle();
-      
-      // Initialize game with user data
       initializeGameWithUser(currentUser);
       
-      // Show main screen
       const mainScreen = document.getElementById('main-screen');
       if (mainScreen) {
         mainScreen.style.display = 'block';
       }
-      
-      console.log('Loaded local account:', currentUser.uid);
       
     } catch (error) {
       console.error('Error loading local account:', error);
       alert('Local account ဖတ်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။');
     }
   } else {
-    // No local account found, create one
+    // Create new local account with all zeros
     createLocalAccount();
   }
 });
 
-// Function to create local account (without Supabase)
+// Function to create local account with all zeros
 function createLocalAccount() {
   const userName = "Local User " + Math.floor(Math.random() * 10000);
   const userId = generate10DigitId();
@@ -10385,9 +10372,9 @@ function createLocalAccount() {
     photoURL: null,
     createdAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
-    tokens: 5, // Starting tokens
-    coins: 100, // Starting coins
-    crystals: 0,
+    tokens: 0, // All zeros
+    coins: 0,  // All zeros
+    crystals: 0, // All zeros
     completedTasks: {
       '3hour': false,
       'channel1': false,
@@ -10430,7 +10417,7 @@ function createLocalAccount() {
   // Update profile circle
   updateProfileCircle();
   
-  // Initialize game
+  // Initialize game with zero values
   initializeGameWithUser(currentUser);
   
   // Show main screen
@@ -10439,7 +10426,7 @@ function createLocalAccount() {
     mainScreen.style.display = 'block';
   }
   
-  alert(`Local account created!\nUser ID: ${userId}\nYou can play offline.`);
+  alert(`Local account created!\nUser ID: ${userId}\nAll values set to 0 for testing.`);
 }
 
 // Modified save function to handle local accounts
@@ -10531,7 +10518,101 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 });
 
+// Function to check if current user is local account
+function isLocalAccount() {
+  return currentUser && currentUser.isLocalAccount === true;
+}
 
+// Override Edit Profile functionality for local accounts
+const originalEditProfile = editProfileBtn.onclick;
+editProfileBtn.onclick = function() {
+  if (isLocalAccount()) {
+    alert('Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။');
+    return;
+  }
+  originalEditProfile.call(this);
+};
+
+// Override Share functionality for local accounts
+function overrideShareFunctions() {
+  // Override Telegram Share
+  const shareButtons = ['btn-share', 'btn-share10'];
+  shareButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      const originalClick = btn.onclick;
+      btn.onclick = function() {
+        if (isLocalAccount()) {
+          alert('Local Account များသည် Share လုပ်ခွင့်မရှိပါ။');
+          return;
+        }
+        if (originalClick) originalClick.call(this);
+      };
+    }
+  });
+}
+
+// Override Frame Purchase for local accounts
+function overrideFrameFunctions() {
+  const frameButtons = document.querySelectorAll('.frame-action-btn');
+  frameButtons.forEach(btn => {
+    const originalClick = btn.onclick;
+    btn.onclick = function() {
+      if (isLocalAccount()) {
+        alert('Local Account များသည် Frame များ၀ယ်ယူခွင့်မရှိပါ။');
+        return;
+      }
+      if (originalClick) originalClick.call(this);
+    };
+  });
+}
+
+// Initialize overrides when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  overrideShareFunctions();
+  overrideFrameFunctions();
+});
+
+// Generate 10-digit ID function
+function generate10DigitId() {
+  const min = 1000000000;
+  const max = 9999999999;
+  const randomId = Math.floor(Math.random() * (max - min + 1)) + min;
+  return randomId.toString();
+}
+
+// Initialize game with user data
+function initializeGameWithUser(user) {
+  tokens = user.tokens || 0;
+  coins = user.coins || 0;
+  crystals = user.crystals || 0;
+  completedTasks = user.completedTasks || {};
+  lastTokenTime = user.lastTokenTime || 0;
+  battleTry = user.battleTry || 0;
+  lastBattleTime = user.lastBattleTime || Date.now();
+  shareCount = user.shareCount || 0;
+  share10Count = user.share10Count || 0;
+  currentUserFrame = user.frameId || 'default';
+
+  // Update UI
+  tokenCountElem.textContent = tokens;
+  coinCountElem.textContent = coins;
+  
+  // Update crystal display
+  const crystalCountElem = document.querySelector('.token-card .crystal + .count');
+  if (crystalCountElem) {
+    crystalCountElem.textContent = crystals;
+  }
+
+  // Update task states
+  updateTaskStates();
+
+  // Start timer for 3-hour task
+  updateTaskTimer();
+  
+  // Save initial state
+  saveUserData();
+}
 
 
   
