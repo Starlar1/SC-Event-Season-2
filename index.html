@@ -10351,17 +10351,19 @@ localAccountBtn.addEventListener('click', function() {
         mainScreen.style.display = 'block';
       }
       
+      console.log('✅ Local account loaded - All progress saved locally');
+      
     } catch (error) {
       console.error('Error loading local account:', error);
       alert('Local account ဖတ်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။');
     }
   } else {
-    // Create new local account with all zeros
+    // Create new local account
     createLocalAccount();
   }
 });
 
-// Function to create local account with all zeros
+// Function to create local account
 function createLocalAccount() {
   const userName = "Local User " + Math.floor(Math.random() * 10000);
   const userId = generate10DigitId();
@@ -10372,9 +10374,9 @@ function createLocalAccount() {
     photoURL: null,
     createdAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
-    tokens: 0, // All zeros
-    coins: 0,  // All zeros
-    crystals: 0, // All zeros
+    tokens: 0,
+    coins: 0,
+    crystals: 0,
     completedTasks: {
       '3hour': false,
       'channel1': false,
@@ -10398,7 +10400,7 @@ function createLocalAccount() {
     share10Count: 0,
     frameId: 'default',
     server: 'server2',
-    isLocalAccount: true // Mark as local account
+    isLocalAccount: true
   };
   
   // Save to localStorage only
@@ -10417,7 +10419,7 @@ function createLocalAccount() {
   // Update profile circle
   updateProfileCircle();
   
-  // Initialize game with zero values
+  // Initialize game
   initializeGameWithUser(currentUser);
   
   // Show main screen
@@ -10426,10 +10428,12 @@ function createLocalAccount() {
     mainScreen.style.display = 'block';
   }
   
-  alert(`Local account created!\nUser ID: ${userId}\nAll values set to 0 for testing.`);
+  alert(`Local account created!\nUser ID: ${userId}\n✅ All progress will be saved locally`);
 }
 
-// Modified save function to handle local accounts
+// ===== MODIFIED SAVE SYSTEM - ALL PROGRESS SAVED LOCALLY =====
+
+// Modified save function - ALL VALUES SAVE TO LOCALSTORAGE
 async function saveUserData() {
   if (currentUser) {
     // Update user data with current game state
@@ -10445,97 +10449,116 @@ async function saveUserData() {
     currentUser.frameId = currentUserFrame;
     currentUser.lastLogin = new Date().toISOString();
 
-    // Always save to localStorage
+    // ✅ ALWAYS save to localStorage (ရရှိထားသော အရာများကို local မှာသိမ်း)
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    console.log('💾 Local storage saved - Tokens:', currentUser.tokens, 'Coins:', currentUser.coins, 'Crystals:', currentUser.crystals);
     
     // Only save to Supabase if NOT a local account
     if (!currentUser.isLocalAccount) {
       try {
         await saveUserToSupabase(currentUser);
+        console.log('🌐 Supabase saved for online account');
       } catch (error) {
         console.error('Error saving to Supabase:', error);
       }
+    } else {
+      console.log('📱 Local account - All progress saved to device');
     }
   }
 }
 
-// Modified user loading to handle both account types
-document.addEventListener('DOMContentLoaded', async function() {
-  const savedUser = localStorage.getItem('currentUser');
-  const userServer = localStorage.getItem('userServer');
+// ===== OVERRIDE EXISTING GAME FUNCTIONS TO SAVE TO LOCAL =====
 
-  if (savedUser && userServer) {
-    try {
-      currentUser = JSON.parse(savedUser);
-      
-      // Check if this is a local account
-      if (currentUser.isLocalAccount) {
-        // For local accounts, always show login screen with local option
-        loginScreen.style.display = 'flex';
-        console.log('Local account detected, showing login options');
-      } else {
-        // For Supabase accounts, proceed with normal loading
-        if (SUPABASE_SERVERS[userServer] && SUPABASE_SERVERS[userServer].enabled) {
-          switchSupabaseClient(userServer);
-          console.log('Loaded Supabase user from:', userServer);
-        } else {
-          console.log('Original server disabled, migrating user...');
-          await migrateUserToNewServer(currentUser);
-        }
-        
-        // Try to sync with Supabase
-        try {
-          const supabaseUser = await getUserFromSupabase(currentUser.uid);
-          if (supabaseUser) {
-            currentUser = {
-              ...currentUser,
-              ...supabaseUser
-            };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            if (supabaseUser.frameId && supabaseUser.frameId !== 'default') {
-              currentUserFrame = supabaseUser.frameId;
-              localStorage.setItem('currentUserFrame', currentUserFrame);
-            }
-          }
-        } catch (supabaseError) {
-          console.log('Using local data, Supabase sync failed:', supabaseError);
-        }
-        
-        updateProfileCircle();
-        initializeGameWithUser(currentUser);
-      }
-      
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('userServer');
-      loginScreen.style.display = 'flex';
+// Override all game functions to auto-save
+function overrideGameFunctions() {
+  // Override event box opening
+  const originalOpenBtn = openBtn.onclick;
+  openBtn.onclick = function() {
+    if (originalOpenBtn) originalOpenBtn.call(this);
+    setTimeout(saveUserData, 100);
+  };
+  
+  // Override task completion
+  const taskButtons = ['btn-3hour', 'btn-channel1', 'btn-channel2', 'btn-channel3', 'btn-channel4', 
+                      'btn-youtube', 'btn-moonton', 'btn-lily', 'btn-maxdiamond', 'btn-diablo', 
+                      'btn-pot', 'btn-starlar-studio'];
+  
+  taskButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      const originalClick = btn.onclick;
+      btn.onclick = function() {
+        if (originalClick) originalClick.call(this);
+        setTimeout(saveUserData, 100);
+      };
     }
-  } else {
-    // No saved user, show login screen
-    loginScreen.style.display = 'flex';
-  }
-});
+  });
+  
+  // Override battle system
+  const originalOpenToken = openTokenBtn.onclick;
+  openTokenBtn.onclick = function() {
+    if (originalOpenToken) originalOpenToken.call(this);
+    setTimeout(saveUserData, 100);
+  };
+
+  // Override exchange system (allowed for local accounts)
+  const exchangeButtons = document.querySelectorAll('.exchange-item');
+  exchangeButtons.forEach(btn => {
+    const originalClick = btn.onclick;
+    btn.onclick = function() {
+      if (originalClick) originalClick.call(this);
+      setTimeout(saveUserData, 100);
+    };
+  });
+
+  // Override frame system (allowed for local accounts)
+  const frameButtons = document.querySelectorAll('.frame-action-btn');
+  frameButtons.forEach(btn => {
+    const originalClick = btn.onclick;
+    btn.onclick = function() {
+      if (originalClick) originalClick.call(this);
+      setTimeout(saveUserData, 100);
+    };
+  });
+}
+
+// ===== STRICT RESTRICTIONS - ONLY EDIT PROFILE AND SHARE BLOCKED =====
 
 // Function to check if current user is local account
 function isLocalAccount() {
   return currentUser && currentUser.isLocalAccount === true;
 }
 
-// Override Edit Profile functionality for local accounts
-const originalEditProfile = editProfileBtn.onclick;
-editProfileBtn.onclick = function() {
+// ❌ STRICTLY BLOCK EDIT PROFILE ONLY
+editProfileBtn.addEventListener('click', function() {
   if (isLocalAccount()) {
-    alert('Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။');
+    alert('❌ Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။\nကျေးဇူးပြု၍ Online Account ဖွင့်၍သုံးပါ။');
     return;
   }
-  originalEditProfile.call(this);
-};
+  
+  // Original functionality for online accounts
+  accountScreen.style.display = 'none';
+  loginScreen.style.display = 'flex';
 
-// Override Share functionality for local accounts
+  if (currentUser) {
+    userNameInput.value = currentUser.displayName;
+
+    if (currentUser.photoURL) {
+      profilePicPreview.src = currentUser.photoURL;
+      profilePicPreview.style.display = 'block';
+      defaultAvatar.style.display = 'none';
+    } else {
+      profilePicPreview.style.display = 'none';
+      defaultAvatar.style.display = 'block';
+    }
+    
+    createAccountBtn.textContent = 'Update Profile';
+  }
+});
+
+// ❌ STRICTLY BLOCK SHARE FUNCTIONS ONLY
 function overrideShareFunctions() {
-  // Override Telegram Share
+  // Override Telegram Share - BLOCKED
   const shareButtons = ['btn-share', 'btn-share10'];
   shareButtons.forEach(btnId => {
     const btn = document.getElementById(btnId);
@@ -10543,7 +10566,7 @@ function overrideShareFunctions() {
       const originalClick = btn.onclick;
       btn.onclick = function() {
         if (isLocalAccount()) {
-          alert('Local Account များသည် Share လုပ်ခွင့်မရှိပါ။');
+          alert('❌ Local Account များသည် Share လုပ်ခွင့်မရှိပါ။\nကျေးဇူးပြု၍ Online Account ဖွင့်၍သုံးပါ။');
           return;
         }
         if (originalClick) originalClick.call(this);
@@ -10552,25 +10575,19 @@ function overrideShareFunctions() {
   });
 }
 
-// Override Frame Purchase for local accounts
-function overrideFrameFunctions() {
-  const frameButtons = document.querySelectorAll('.frame-action-btn');
-  frameButtons.forEach(btn => {
-    const originalClick = btn.onclick;
-    btn.onclick = function() {
-      if (isLocalAccount()) {
-        alert('Local Account များသည် Frame များ၀ယ်ယူခွင့်မရှိပါ။');
-        return;
-      }
-      if (originalClick) originalClick.call(this);
-    };
-  });
-}
+// ✅ ALLOW EVERYTHING ELSE FOR LOCAL ACCOUNTS
+// - Frame purchase: ALLOWED ✅
+// - Exchange system: ALLOWED ✅  
+// - Battle system: ALLOWED ✅
+// - Event box: ALLOWED ✅
+// - Tasks: ALLOWED ✅
+
+// ===== INITIALIZATION =====
 
 // Initialize overrides when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  overrideShareFunctions();
-  overrideFrameFunctions();
+  overrideShareFunctions(); // Only block share functions
+  overrideGameFunctions(); // Enable auto-save for all game functions
 });
 
 // Generate 10-digit ID function
@@ -10610,9 +10627,65 @@ function initializeGameWithUser(user) {
   // Start timer for 3-hour task
   updateTaskTimer();
   
-  // Save initial state
+  // Save initial state to localStorage
   saveUserData();
+  
+  console.log('🎮 Game initialized - All features enabled except Edit Profile and Share');
 }
+
+// ===== AUTO-SAVE FEATURE =====
+
+// Auto-save every 30 seconds
+setInterval(function() {
+  if (currentUser && currentUser.isLocalAccount) {
+    saveUserData();
+    console.log('🔄 Auto-saved local account progress');
+  }
+}, 30000);
+
+// Save when user leaves the page
+window.addEventListener('beforeunload', function() {
+  if (currentUser && currentUser.isLocalAccount) {
+    saveUserData();
+    console.log('📤 Saved all local account progress before page close');
+  }
+});
+
+// ===== ENHANCED LOCAL ACCOUNT FEATURES =====
+
+// Allow frame system for local accounts
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('frame-action-btn')) {
+    if (isLocalAccount()) {
+      // ✅ ALLOWED - Frame purchase for local accounts
+      setTimeout(saveUserData, 100);
+    }
+  }
+});
+
+// Allow exchange system for local accounts  
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('exchange-item')) {
+    if (isLocalAccount()) {
+      // ✅ ALLOWED - Exchange for local accounts
+      setTimeout(saveUserData, 100);
+    }
+  }
+});
+
+// Allow battle system for local accounts
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'open-token-btn') {
+    if (isLocalAccount()) {
+      // ✅ ALLOWED - Battle for local accounts
+      setTimeout(saveUserData, 100);
+    }
+  }
+});
+
+console.log('🔧 Local Account System Loaded - Edit Profile and Share Blocked, Everything Else Allowed');
+
+
 
 
   
