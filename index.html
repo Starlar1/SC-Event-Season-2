@@ -10431,6 +10431,42 @@ function createLocalAccount() {
   alert(`Local account created!\nUser ID: ${userId}\n✅ All progress will be saved locally`);
 }
 
+// ===== MODIFIED USER LOADING - ALWAYS SHOW LOGIN SCREEN =====
+
+// Modified user loading to ALWAYS show login screen
+document.addEventListener('DOMContentLoaded', async function() {
+  const savedUser = localStorage.getItem('currentUser');
+  const userServer = localStorage.getItem('userServer');
+
+  // ✅ ALWAYS show login screen on every page load
+  loginScreen.style.display = 'flex';
+  
+  if (savedUser && userServer) {
+    try {
+      currentUser = JSON.parse(savedUser);
+      
+      // Check if this is a local account
+      if (currentUser.isLocalAccount) {
+        console.log('Local account detected - Login screen shown');
+        // Keep login screen visible, user must click "My Local Acc ဝင်မည်"
+      } else {
+        // For Supabase accounts, keep login screen visible
+        console.log('Supabase account detected - Login screen shown');
+        // User must click "အကောင့်ဖွင့်မည်" or enter credentials
+      }
+      
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userServer');
+      // Login screen already visible
+    }
+  } else {
+    // No saved user, login screen already visible
+    console.log('No saved account - Login screen shown');
+  }
+});
+
 // ===== MODIFIED SAVE SYSTEM - ALL PROGRESS SAVED LOCALLY =====
 
 // Modified save function - ALL VALUES SAVE TO LOCALSTORAGE
@@ -10575,12 +10611,19 @@ function overrideShareFunctions() {
   });
 }
 
-// ✅ ALLOW EVERYTHING ELSE FOR LOCAL ACCOUNTS
-// - Frame purchase: ALLOWED ✅
-// - Exchange system: ALLOWED ✅  
-// - Battle system: ALLOWED ✅
-// - Event box: ALLOWED ✅
-// - Tasks: ALLOWED ✅
+// ===== AUTO LOGOUT ON PAGE RELOAD =====
+
+// Clear current user session on page load (but keep localStorage data)
+window.addEventListener('beforeunload', function() {
+  // Don't clear localStorage, just the current session
+  console.log('🔄 Page reloading - Login screen will show again');
+});
+
+// Force login screen on every page visit
+window.addEventListener('load', function() {
+  console.log('🔄 Page loaded - Showing login screen');
+  // Login screen is already set to display: flex in DOMContentLoaded
+});
 
 // ===== INITIALIZATION =====
 
@@ -10588,6 +10631,18 @@ function overrideShareFunctions() {
 document.addEventListener('DOMContentLoaded', function() {
   overrideShareFunctions(); // Only block share functions
   overrideGameFunctions(); // Enable auto-save for all game functions
+  
+  // ✅ Ensure login screen is always visible on page load
+  const loginScreen = document.getElementById('login-screen');
+  if (loginScreen) {
+    loginScreen.style.display = 'flex';
+  }
+  
+  // Hide main screen on page load
+  const mainScreen = document.getElementById('main-screen');
+  if (mainScreen) {
+    mainScreen.style.display = 'none';
+  }
 });
 
 // Generate 10-digit ID function
@@ -10683,9 +10738,11 @@ document.addEventListener('click', function(e) {
   }
 });
 
-console.log('🔧 Local Account System Loaded - Edit Profile and Share Blocked, Everything Else Allowed');
+console.log('🔧 Local Account System Loaded - Login Screen Always Shows on Page Load');
+    
 
 
+  
 
 
   
