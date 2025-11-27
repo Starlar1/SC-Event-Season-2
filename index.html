@@ -2402,7 +2402,7 @@ body {
     </button>
     
   <button class="login-btn secondary-btn" id="local-account-btn">
-    Local Data Acc ၀င်မည်
+    My Local Acc ဝင်မည်
   </button>
   
   <p class="login-note">အကောင့်ဖွင့်ပြီးမှ Event ကိုဝင်ရောက်နိုင်မည်</p>
@@ -3525,13 +3525,13 @@ body {
         </div>
         <div class="exchange-card">
           <img src="https://iili.io/KGlFqle.jpg">
-          <p>11 Diamond - 9000 Coin - 4 ယောက်သာလဲနိုင်</p>
-          <button class="btn exchange-item" data-diamond="11" data-coins="9000">လဲမည်</button>
+          <p>11 Diamond - 8500 Coin - 8 ယောက်သာလဲနိုင်</p>
+          <button class="btn exchange-item" data-diamond="11" data-coins="8500">လဲမည်</button>
         </div>
         <div class="exchange-card">
           <img src="https://iili.io/KGlfSK7.jpg">
-          <p>50 + 50 Diamond - 20000 Coins - လဲမရတော့ပါ</p>
-          <button class="btn exchange-item" data-diamond="100" data-coins="200000">လဲမရသေးပါ</button>
+          <p>50 + 50 Diamond - 20000 Coins - 1 ယောက်သာလဲနိုင်</p>
+          <button class="btn exchange-item" data-diamond="100" data-coins="20000">လဲမည်</button>
         </div>
         
                <!-- NEW: Wp Pass Item -->
@@ -10320,7 +10320,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
 // ===== LOCAL ACCOUNT SYSTEM =====
 
 // DOM Elements for Local Account
@@ -10328,41 +10327,54 @@ const localAccountBtn = document.getElementById('local-account-btn');
 
 // Local Account Button Click Event
 localAccountBtn.addEventListener('click', function() {
+  // Check if there's a local account
   const savedUser = localStorage.getItem('currentUser');
   
   if (savedUser) {
-    // Load existing local account - အရင် local ACC data ကိုပဲပြန်ရမယ်
+    // Load existing local account
     try {
       currentUser = JSON.parse(savedUser);
+      
+      // Set current server from saved data or default
       currentServer = currentUser.server || 'server2';
       localStorage.setItem('currentServer', currentServer);
       
+      // Switch to appropriate Supabase client
       if (SUPABASE_SERVERS[currentServer] && SUPABASE_SERVERS[currentServer].enabled) {
         switchSupabaseClient(currentServer);
       } else {
+        // If saved server is disabled, use default
         switchSupabaseClient('server2');
       }
       
+      // Hide login screen
       loginScreen.style.display = 'none';
+      
+      // Update profile circle
       updateProfileCircle();
+      
+      // Initialize game with user data
       initializeGameWithUser(currentUser);
       
+      // Show main screen
       const mainScreen = document.getElementById('main-screen');
       if (mainScreen) {
         mainScreen.style.display = 'block';
       }
+      
+      console.log('Loaded local account:', currentUser.uid);
       
     } catch (error) {
       console.error('Error loading local account:', error);
       alert('Local account ဖတ်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။');
     }
   } else {
-    // Only create new local account if no existing data
+    // No local account found, create one
     createLocalAccount();
   }
 });
 
-// Function to create local account (only when no existing data)
+// Function to create local account (without Supabase)
 function createLocalAccount() {
   const userName = "Local User " + Math.floor(Math.random() * 10000);
   const userId = generate10DigitId();
@@ -10373,8 +10385,8 @@ function createLocalAccount() {
     photoURL: null,
     createdAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
-    tokens: 0,
-    coins: 0,
+    tokens: 5, // Starting tokens
+    coins: 100, // Starting coins
     crystals: 0,
     completedTasks: {
       '3hour': false,
@@ -10399,7 +10411,7 @@ function createLocalAccount() {
     share10Count: 0,
     frameId: 'default',
     server: 'server2',
-    isLocalAccount: true
+    isLocalAccount: true // Mark as local account
   };
   
   // Save to localStorage only
@@ -10426,45 +10438,11 @@ function createLocalAccount() {
   if (mainScreen) {
     mainScreen.style.display = 'block';
   }
+  
+  alert(`Local account created!\nUser ID: ${userId}\nYou can play offline.`);
 }
 
-// ===== MODIFIED USER LOADING - ALWAYS SHOW LOGIN SCREEN WITHOUT DISPLAYING DATA =====
-
-// Modified user loading to ALWAYS show login screen but don't display existing data
-document.addEventListener('DOMContentLoaded', async function() {
-  const savedUser = localStorage.getItem('currentUser');
-  const userServer = localStorage.getItem('userServer');
-
-  // ✅ ALWAYS show login screen on every page load
-  loginScreen.style.display = 'flex';
-  
-  if (savedUser && userServer) {
-    try {
-      currentUser = JSON.parse(savedUser);
-      
-      // Check if this is a local account
-      if (currentUser.isLocalAccount) {
-        // Just load the data, don't display anything
-        console.log('Existing Local account detected - Data ready for loading');
-      } else {
-        // For Supabase accounts
-        console.log('Supabase account detected - Login screen shown');
-      }
-      
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('userServer');
-    }
-  } else {
-    // No saved user
-    console.log('No saved account - Can create new local account');
-  }
-});
-
-// ===== MODIFIED SAVE SYSTEM - ALL PROGRESS SAVED LOCALLY =====
-
-// Modified save function - ALL VALUES SAVE TO LOCALSTORAGE
+// Modified save function to handle local accounts
 async function saveUserData() {
   if (currentUser) {
     // Update user data with current game state
@@ -10480,7 +10458,7 @@ async function saveUserData() {
     currentUser.frameId = currentUserFrame;
     currentUser.lastLogin = new Date().toISOString();
 
-    // ✅ ALWAYS save to localStorage (ရရှိထားသော အရာများကို local မှာသိမ်း)
+    // Always save to localStorage
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     
     // Only save to Supabase if NOT a local account
@@ -10494,196 +10472,65 @@ async function saveUserData() {
   }
 }
 
-// ===== OVERRIDE EXISTING GAME FUNCTIONS TO SAVE TO LOCAL =====
+// Modified user loading to handle both account types
+document.addEventListener('DOMContentLoaded', async function() {
+  const savedUser = localStorage.getItem('currentUser');
+  const userServer = localStorage.getItem('userServer');
 
-// Override all game functions to auto-save
-function overrideGameFunctions() {
-  // Override event box opening
-  const originalOpenBtn = openBtn.onclick;
-  openBtn.onclick = function() {
-    if (originalOpenBtn) originalOpenBtn.call(this);
-    setTimeout(saveUserData, 100);
-  };
-  
-  // Override task completion
-  const taskButtons = ['btn-3hour', 'btn-channel1', 'btn-channel2', 'btn-channel3', 'btn-channel4', 
-                      'btn-youtube', 'btn-moonton', 'btn-lily', 'btn-maxdiamond', 'btn-diablo', 
-                      'btn-pot', 'btn-starlar-studio'];
-  
-  taskButtons.forEach(btnId => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      const originalClick = btn.onclick;
-      btn.onclick = function() {
-        if (originalClick) originalClick.call(this);
-        setTimeout(saveUserData, 100);
-      };
-    }
-  });
-  
-  // Override battle system
-  const originalOpenToken = openTokenBtn.onclick;
-  openTokenBtn.onclick = function() {
-    if (originalOpenToken) originalOpenToken.call(this);
-    setTimeout(saveUserData, 100);
-  };
-
-  // Override exchange system (allowed for local accounts)
-  const exchangeButtons = document.querySelectorAll('.exchange-item');
-  exchangeButtons.forEach(btn => {
-    const originalClick = btn.onclick;
-    btn.onclick = function() {
-      if (originalClick) originalClick.call(this);
-      setTimeout(saveUserData, 100);
-    };
-  });
-
-  // Override frame system (allowed for local accounts)
-  const frameButtons = document.querySelectorAll('.frame-action-btn');
-  frameButtons.forEach(btn => {
-    const originalClick = btn.onclick;
-    btn.onclick = function() {
-      if (originalClick) originalClick.call(this);
-      setTimeout(saveUserData, 100);
-    };
-  });
-}
-
-// ===== STRICT RESTRICTIONS - ONLY EDIT PROFILE AND SHARE BLOCKED =====
-
-// Function to check if current user is local account
-function isLocalAccount() {
-  return currentUser && currentUser.isLocalAccount === true;
-}
-
-// ❌ STRICTLY BLOCK EDIT PROFILE ONLY
-editProfileBtn.addEventListener('click', function() {
-  if (isLocalAccount()) {
-    alert('❌ Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။');
-    return;
-  }
-  
-  // Original functionality for online accounts
-  accountScreen.style.display = 'none';
-  loginScreen.style.display = 'flex';
-
-  if (currentUser) {
-    userNameInput.value = currentUser.displayName;
-
-    if (currentUser.photoURL) {
-      profilePicPreview.src = currentUser.photoURL;
-      profilePicPreview.style.display = 'block';
-      defaultAvatar.style.display = 'none';
-    } else {
-      profilePicPreview.style.display = 'none';
-      defaultAvatar.style.display = 'block';
-    }
-    
-    createAccountBtn.textContent = 'Update Profile';
-  }
-});
-
-// ❌ STRICTLY BLOCK SHARE FUNCTIONS ONLY
-function overrideShareFunctions() {
-  // Override Telegram Share - BLOCKED
-  const shareButtons = ['btn-share', 'btn-share10'];
-  shareButtons.forEach(btnId => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      const originalClick = btn.onclick;
-      btn.onclick = function() {
-        if (isLocalAccount()) {
-          alert('❌ Local Account များသည် Share လုပ်ခွင့်မရှိပါ။');
-          return;
+  if (savedUser && userServer) {
+    try {
+      currentUser = JSON.parse(savedUser);
+      
+      // Check if this is a local account
+      if (currentUser.isLocalAccount) {
+        // For local accounts, always show login screen with local option
+        loginScreen.style.display = 'flex';
+        console.log('Local account detected, showing login options');
+      } else {
+        // For Supabase accounts, proceed with normal loading
+        if (SUPABASE_SERVERS[userServer] && SUPABASE_SERVERS[userServer].enabled) {
+          switchSupabaseClient(userServer);
+          console.log('Loaded Supabase user from:', userServer);
+        } else {
+          console.log('Original server disabled, migrating user...');
+          await migrateUserToNewServer(currentUser);
         }
-        if (originalClick) originalClick.call(this);
-      };
+        
+        // Try to sync with Supabase
+        try {
+          const supabaseUser = await getUserFromSupabase(currentUser.uid);
+          if (supabaseUser) {
+            currentUser = {
+              ...currentUser,
+              ...supabaseUser
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            if (supabaseUser.frameId && supabaseUser.frameId !== 'default') {
+              currentUserFrame = supabaseUser.frameId;
+              localStorage.setItem('currentUserFrame', currentUserFrame);
+            }
+          }
+        } catch (supabaseError) {
+          console.log('Using local data, Supabase sync failed:', supabaseError);
+        }
+        
+        updateProfileCircle();
+        initializeGameWithUser(currentUser);
+      }
+      
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userServer');
+      loginScreen.style.display = 'flex';
     }
-  });
-}
-
-// ===== INITIALIZATION =====
-
-// Initialize overrides when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  overrideShareFunctions(); // Only block share functions
-  overrideGameFunctions(); // Enable auto-save for all game functions
-  
-  // ✅ Ensure login screen is always visible on page load
-  const loginScreen = document.getElementById('login-screen');
-  if (loginScreen) {
+  } else {
+    // No saved user, show login screen
     loginScreen.style.display = 'flex';
   }
-  
-  // Hide main screen on page load
-  const mainScreen = document.getElementById('main-screen');
-  if (mainScreen) {
-    mainScreen.style.display = 'none';
-  }
 });
 
-// Generate 10-digit ID function
-function generate10DigitId() {
-  const min = 1000000000;
-  const max = 9999999999;
-  const randomId = Math.floor(Math.random() * (max - min + 1)) + min;
-  return randomId.toString();
-}
-
-// Initialize game with user data - RESTORE ALL EXISTING DATA SILENTLY
-function initializeGameWithUser(user) {
-  // ✅ အရင် local ACC data ကိုပဲပြန်ရမယ် - အသစ်မဖြစ်ရ
-  tokens = user.tokens || 0;
-  coins = user.coins || 0;
-  crystals = user.crystals || 0;
-  completedTasks = user.completedTasks || {};
-  lastTokenTime = user.lastTokenTime || 0;
-  battleTry = user.battleTry || 0;
-  lastBattleTime = user.lastBattleTime || Date.now();
-  shareCount = user.shareCount || 0;
-  share10Count = user.share10Count || 0;
-  currentUserFrame = user.frameId || 'default';
-
-  // Update UI with restored data (no alerts or displays)
-  tokenCountElem.textContent = tokens;
-  coinCountElem.textContent = coins;
-  
-  // Update crystal display
-  const crystalCountElem = document.querySelector('.token-card .crystal + .count');
-  if (crystalCountElem) {
-    crystalCountElem.textContent = crystals;
-  }
-
-  // Update task states with restored data
-  updateTaskStates();
-
-  // Start timer for 3-hour task
-  updateTaskTimer();
-  
-  // Save current state to localStorage (to confirm restoration)
-  saveUserData();
-}
-
-// ===== AUTO-SAVE FEATURE =====
-
-// Auto-save every 30 seconds to preserve all progress
-setInterval(function() {
-  if (currentUser && currentUser.isLocalAccount) {
-    saveUserData();
-  }
-}, 30000);
-
-// Save when user leaves the page
-window.addEventListener('beforeunload', function() {
-  if (currentUser && currentUser.isLocalAccount) {
-    saveUserData();
-  }
-});
-  
-
-    
-
-        
 
 
 
