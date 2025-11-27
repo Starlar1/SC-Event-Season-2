@@ -10320,61 +10320,49 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// ===== LOCAL ACCOUNT SYSTEM =====
+
+  // ===== LOCAL ACCOUNT SYSTEM - FOR ONLINE USERS ONLY =====
 
 // DOM Elements for Local Account
 const localAccountBtn = document.getElementById('local-account-btn');
 
 // Local Account Button Click Event
 localAccountBtn.addEventListener('click', function() {
-  // Check if there's a local account
   const savedUser = localStorage.getItem('currentUser');
   
   if (savedUser) {
     // Load existing local account
     try {
       currentUser = JSON.parse(savedUser);
-      
-      // Set current server from saved data or default
       currentServer = currentUser.server || 'server2';
       localStorage.setItem('currentServer', currentServer);
       
-      // Switch to appropriate Supabase client
       if (SUPABASE_SERVERS[currentServer] && SUPABASE_SERVERS[currentServer].enabled) {
         switchSupabaseClient(currentServer);
       } else {
-        // If saved server is disabled, use default
         switchSupabaseClient('server2');
       }
       
-      // Hide login screen
       loginScreen.style.display = 'none';
-      
-      // Update profile circle
       updateProfileCircle();
-      
-      // Initialize game with user data
       initializeGameWithUser(currentUser);
       
-      // Show main screen
       const mainScreen = document.getElementById('main-screen');
       if (mainScreen) {
         mainScreen.style.display = 'block';
       }
-      
-      console.log('Loaded local account:', currentUser.uid);
       
     } catch (error) {
       console.error('Error loading local account:', error);
       alert('Local account ဖတ်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။');
     }
   } else {
-    // No local account found, create one
+    // Only create new local account if no existing data
     createLocalAccount();
   }
 });
 
-// Function to create local account (without Supabase)
+// Function to create local account (only when no existing data)
 function createLocalAccount() {
   const userName = "Local User " + Math.floor(Math.random() * 10000);
   const userId = generate10DigitId();
@@ -10385,8 +10373,8 @@ function createLocalAccount() {
     photoURL: null,
     createdAt: new Date().toISOString(),
     lastLogin: new Date().toISOString(),
-    tokens: 5, // Starting tokens
-    coins: 100, // Starting coins
+    tokens: 0,
+    coins: 0,
     crystals: 0,
     completedTasks: {
       '3hour': false,
@@ -10411,7 +10399,7 @@ function createLocalAccount() {
     share10Count: 0,
     frameId: 'default',
     server: 'server2',
-    isLocalAccount: true // Mark as local account
+    isLocalAccount: true
   };
   
   // Save to localStorage only
@@ -10438,11 +10426,61 @@ function createLocalAccount() {
   if (mainScreen) {
     mainScreen.style.display = 'block';
   }
-  
-  alert(`Local account created!\nUser ID: ${userId}\nYou can play offline.`);
 }
 
-// Modified save function to handle local accounts
+// ===== MODIFIED USER LOADING - HIDE LOGIN SCREEN FOR ONLINE USERS =====
+
+// Modified user loading - Only show login screen for new users
+document.addEventListener('DOMContentLoaded', async function() {
+  const savedUser = localStorage.getItem('currentUser');
+  const userServer = localStorage.getItem('userServer');
+
+  if (savedUser && userServer) {
+    try {
+      currentUser = JSON.parse(savedUser);
+      
+      // Check if this is an ONLINE account (NOT local)
+      if (!currentUser.isLocalAccount) {
+        // ✅ Online user - Auto login, don't show login screen
+        console.log('Online account detected - Auto logging in');
+        
+        if (SUPABASE_SERVERS[userServer] && SUPABASE_SERVERS[userServer].enabled) {
+          switchSupabaseClient(userServer);
+        } else {
+          switchSupabaseClient('server2');
+        }
+        
+        loginScreen.style.display = 'none';
+        updateProfileCircle();
+        initializeGameWithUser(currentUser);
+        
+        const mainScreen = document.getElementById('main-screen');
+        if (mainScreen) {
+          mainScreen.style.display = 'block';
+        }
+        
+      } else {
+        // ❌ Local user - Show login screen with local option
+        console.log('Local account detected - Showing login screen');
+        loginScreen.style.display = 'flex';
+      }
+      
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userServer');
+      loginScreen.style.display = 'flex';
+    }
+  } else {
+    // No saved user - Show login screen
+    console.log('No saved account - Showing login screen');
+    loginScreen.style.display = 'flex';
+  }
+});
+
+// ===== MODIFIED SAVE SYSTEM =====
+
+// Modified save function
 async function saveUserData() {
   if (currentUser) {
     // Update user data with current game state
@@ -10458,7 +10496,7 @@ async function saveUserData() {
     currentUser.frameId = currentUserFrame;
     currentUser.lastLogin = new Date().toISOString();
 
-    // Always save to localStorage
+    // Save to localStorage
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     
     // Only save to Supabase if NOT a local account
@@ -10472,64 +10510,178 @@ async function saveUserData() {
   }
 }
 
-// Modified user loading to handle both account types
-document.addEventListener('DOMContentLoaded', async function() {
-  const savedUser = localStorage.getItem('currentUser');
-  const userServer = localStorage.getItem('userServer');
+// ===== OVERRIDE EXISTING GAME FUNCTIONS =====
 
-  if (savedUser && userServer) {
-    try {
-      currentUser = JSON.parse(savedUser);
-      
-      // Check if this is a local account
-      if (currentUser.isLocalAccount) {
-        // For local accounts, always show login screen with local option
-        loginScreen.style.display = 'flex';
-        console.log('Local account detected, showing login options');
-      } else {
-        // For Supabase accounts, proceed with normal loading
-        if (SUPABASE_SERVERS[userServer] && SUPABASE_SERVERS[userServer].enabled) {
-          switchSupabaseClient(userServer);
-          console.log('Loaded Supabase user from:', userServer);
-        } else {
-          console.log('Original server disabled, migrating user...');
-          await migrateUserToNewServer(currentUser);
-        }
-        
-        // Try to sync with Supabase
-        try {
-          const supabaseUser = await getUserFromSupabase(currentUser.uid);
-          if (supabaseUser) {
-            currentUser = {
-              ...currentUser,
-              ...supabaseUser
-            };
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            if (supabaseUser.frameId && supabaseUser.frameId !== 'default') {
-              currentUserFrame = supabaseUser.frameId;
-              localStorage.setItem('currentUserFrame', currentUserFrame);
-            }
-          }
-        } catch (supabaseError) {
-          console.log('Using local data, Supabase sync failed:', supabaseError);
-        }
-        
-        updateProfileCircle();
-        initializeGameWithUser(currentUser);
-      }
-      
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('userServer');
-      loginScreen.style.display = 'flex';
+// Override all game functions to auto-save
+function overrideGameFunctions() {
+  // Override event box opening
+  const originalOpenBtn = openBtn.onclick;
+  openBtn.onclick = function() {
+    if (originalOpenBtn) originalOpenBtn.call(this);
+    setTimeout(saveUserData, 100);
+  };
+  
+  // Override task completion
+  const taskButtons = ['btn-3hour', 'btn-channel1', 'btn-channel2', 'btn-channel3', 'btn-channel4', 
+                      'btn-youtube', 'btn-moonton', 'btn-lily', 'btn-maxdiamond', 'btn-diablo', 
+                      'btn-pot', 'btn-starlar-studio'];
+  
+  taskButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      const originalClick = btn.onclick;
+      btn.onclick = function() {
+        if (originalClick) originalClick.call(this);
+        setTimeout(saveUserData, 100);
+      };
     }
-  } else {
-    // No saved user, show login screen
-    loginScreen.style.display = 'flex';
+  });
+  
+  // Override battle system
+  const originalOpenToken = openTokenBtn.onclick;
+  openTokenBtn.onclick = function() {
+    if (originalOpenToken) originalOpenToken.call(this);
+    setTimeout(saveUserData, 100);
+  };
+
+  // Override exchange system
+  const exchangeButtons = document.querySelectorAll('.exchange-item');
+  exchangeButtons.forEach(btn => {
+    const originalClick = btn.onclick;
+    btn.onclick = function() {
+      if (originalClick) originalClick.call(this);
+      setTimeout(saveUserData, 100);
+    };
+  });
+
+  // Override frame system
+  const frameButtons = document.querySelectorAll('.frame-action-btn');
+  frameButtons.forEach(btn => {
+    const originalClick = btn.onclick;
+    btn.onclick = function() {
+      if (originalClick) originalClick.call(this);
+      setTimeout(saveUserData, 100);
+    };
+  });
+}
+
+// ===== STRICT RESTRICTIONS - ONLY EDIT PROFILE AND SHARE BLOCKED FOR LOCAL =====
+
+// Function to check if current user is local account
+function isLocalAccount() {
+  return currentUser && currentUser.isLocalAccount === true;
+}
+
+// ❌ STRICTLY BLOCK EDIT PROFILE ONLY FOR LOCAL
+editProfileBtn.addEventListener('click', function() {
+  if (isLocalAccount()) {
+    alert('❌ Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။');
+    return;
+  }
+  
+  // Original functionality for online accounts
+  accountScreen.style.display = 'none';
+  loginScreen.style.display = 'flex';
+
+  if (currentUser) {
+    userNameInput.value = currentUser.displayName;
+
+    if (currentUser.photoURL) {
+      profilePicPreview.src = currentUser.photoURL;
+      profilePicPreview.style.display = 'block';
+      defaultAvatar.style.display = 'none';
+    } else {
+      profilePicPreview.style.display = 'none';
+      defaultAvatar.style.display = 'block';
+    }
+    
+    createAccountBtn.textContent = 'Update Profile';
   }
 });
+
+// ❌ STRICTLY BLOCK SHARE FUNCTIONS ONLY FOR LOCAL
+function overrideShareFunctions() {
+  // Override Telegram Share - BLOCKED FOR LOCAL
+  const shareButtons = ['btn-share', 'btn-share10'];
+  shareButtons.forEach(btnId => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      const originalClick = btn.onclick;
+      btn.onclick = function() {
+        if (isLocalAccount()) {
+          alert('❌ Local Account များသည် Share လုပ်ခွင့်မရှိပါ။');
+          return;
+        }
+        if (originalClick) originalClick.call(this);
+      };
+    }
+  });
+}
+
+// ===== INITIALIZATION =====
+
+// Initialize overrides when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  overrideShareFunctions(); // Only block share functions for local
+  overrideGameFunctions(); // Enable auto-save for all game functions
+});
+
+// Generate 10-digit ID function
+function generate10DigitId() {
+  const min = 1000000000;
+  const max = 9999999999;
+  const randomId = Math.floor(Math.random() * (max - min + 1)) + min;
+  return randomId.toString();
+}
+
+// Initialize game with user data
+function initializeGameWithUser(user) {
+  tokens = user.tokens || 0;
+  coins = user.coins || 0;
+  crystals = user.crystals || 0;
+  completedTasks = user.completedTasks || {};
+  lastTokenTime = user.lastTokenTime || 0;
+  battleTry = user.battleTry || 0;
+  lastBattleTime = user.lastBattleTime || Date.now();
+  shareCount = user.shareCount || 0;
+  share10Count = user.share10Count || 0;
+  currentUserFrame = user.frameId || 'default';
+
+  // Update UI
+  tokenCountElem.textContent = tokens;
+  coinCountElem.textContent = coins;
+  
+  // Update crystal display
+  const crystalCountElem = document.querySelector('.token-card .crystal + .count');
+  if (crystalCountElem) {
+    crystalCountElem.textContent = crystals;
+  }
+
+  // Update task states
+  updateTaskStates();
+
+  // Start timer for 3-hour task
+  updateTaskTimer();
+  
+  // Save current state to localStorage
+  saveUserData();
+}
+
+// ===== AUTO-SAVE FEATURE =====
+
+// Auto-save every 30 seconds
+setInterval(function() {
+  if (currentUser) {
+    saveUserData();
+  }
+}, 30000);
+
+// Save when user leaves the page
+window.addEventListener('beforeunload', function() {
+  if (currentUser) {
+    saveUserData();
+  }
+});      
 
 
 
