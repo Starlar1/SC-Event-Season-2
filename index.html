@@ -10320,6 +10320,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+
 // ===== LOCAL ACCOUNT SYSTEM =====
 
 // DOM Elements for Local Account
@@ -10330,7 +10331,7 @@ localAccountBtn.addEventListener('click', function() {
   const savedUser = localStorage.getItem('currentUser');
   
   if (savedUser) {
-    // Load existing local account
+    // Load existing local account - အရင် local ACC data ကိုပဲပြန်ရမယ်
     try {
       currentUser = JSON.parse(savedUser);
       currentServer = currentUser.server || 'server2';
@@ -10351,19 +10352,19 @@ localAccountBtn.addEventListener('click', function() {
         mainScreen.style.display = 'block';
       }
       
-      console.log('✅ Local account loaded - All progress saved locally');
+      console.log('✅ Local account loaded - All previous progress restored');
       
     } catch (error) {
       console.error('Error loading local account:', error);
       alert('Local account ဖတ်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။');
     }
   } else {
-    // Create new local account
+    // Only create new local account if no existing data
     createLocalAccount();
   }
 });
 
-// Function to create local account
+// Function to create local account (only when no existing data)
 function createLocalAccount() {
   const userName = "Local User " + Math.floor(Math.random() * 10000);
   const userId = generate10DigitId();
@@ -10431,9 +10432,9 @@ function createLocalAccount() {
   alert(`Local account created!\nUser ID: ${userId}\n✅ All progress will be saved locally`);
 }
 
-// ===== MODIFIED USER LOADING - ALWAYS SHOW LOGIN SCREEN =====
+// ===== MODIFIED USER LOADING - ALWAYS SHOW LOGIN SCREEN WITH EXISTING DATA =====
 
-// Modified user loading to ALWAYS show login screen
+// Modified user loading to ALWAYS show login screen but keep existing data
 document.addEventListener('DOMContentLoaded', async function() {
   const savedUser = localStorage.getItem('currentUser');
   const userServer = localStorage.getItem('userServer');
@@ -10447,25 +10448,71 @@ document.addEventListener('DOMContentLoaded', async function() {
       
       // Check if this is a local account
       if (currentUser.isLocalAccount) {
-        console.log('Local account detected - Login screen shown');
-        // Keep login screen visible, user must click "My Local Acc ဝင်မည်"
+        console.log('Existing Local account detected - Showing saved data');
+        
+        // Show existing user info with all saved data
+        showExistingUserInfo();
+        
+        // Update local account button to show it will load existing data
+        if (localAccountBtn) {
+          localAccountBtn.innerHTML = `My Local Acc ဝင်မည်<br><small>(${currentUser.displayName} - ရှိပြီးသား Data ပြန်ရမည်)</small>`;
+        }
       } else {
-        // For Supabase accounts, keep login screen visible
+        // For Supabase accounts
         console.log('Supabase account detected - Login screen shown');
-        // User must click "အကောင့်ဖွင့်မည်" or enter credentials
       }
       
     } catch (error) {
       console.error('Error loading user data:', error);
       localStorage.removeItem('currentUser');
       localStorage.removeItem('userServer');
-      // Login screen already visible
     }
   } else {
-    // No saved user, login screen already visible
-    console.log('No saved account - Login screen shown');
+    // No saved user
+    console.log('No saved account - Can create new local account');
   }
 });
+
+// Show existing user info with all saved data
+function showExistingUserInfo() {
+  if (currentUser && currentUser.isLocalAccount) {
+    const existingUserInfo = document.createElement('div');
+    existingUserInfo.className = 'existing-user-info';
+    
+    // Calculate completed tasks count
+    const completedTasksCount = Object.values(currentUser.completedTasks).filter(task => task === true).length;
+    const totalTasks = Object.keys(currentUser.completedTasks).length;
+    
+    existingUserInfo.innerHTML = `
+      <div style="background: rgba(255,193,7,0.2); padding: 12px; border-radius: 10px; margin: 10px 0; border: 1px solid rgba(255,193,7,0.5);">
+        <div style="font-size: 12px; color: #ffcc00; margin-bottom: 8px; font-weight: bold;">
+          ✅ ရှိပြီးသား Local Account တွေ့ရှိပါသည်
+        </div>
+        <div style="font-size: 11px; color: white; line-height: 1.4;">
+          <strong>User:</strong> ${currentUser.displayName}<br>
+          <strong>ID:</strong> ${currentUser.uid}<br>
+          <strong>Tokens:</strong> ${currentUser.tokens} | <strong>Coins:</strong> ${currentUser.coins} | <strong>Crystals:</strong> ${currentUser.crystals}<br>
+          <strong>Completed Tasks:</strong> ${completedTasksCount}/${totalTasks}<br>
+          <strong>Last Login:</strong> ${new Date(currentUser.lastLogin).toLocaleDateString()}
+        </div>
+        <div style="font-size: 10px; color: #90ee90; margin-top: 5px; font-style: italic;">
+          "My Local Acc ဝင်မည်" နှိပ်ပါက အထက်ပါ Data အားလုံးပြန်ရရှိမည်
+        </div>
+      </div>
+    `;
+    
+    const loginContainer = document.querySelector('.login-container');
+    const localBtn = document.getElementById('local-account-btn');
+    if (loginContainer && localBtn) {
+      // Remove existing info if any
+      const existingInfo = loginContainer.querySelector('.existing-user-info');
+      if (existingInfo) {
+        existingInfo.remove();
+      }
+      loginContainer.insertBefore(existingUserInfo, localBtn);
+    }
+  }
+}
 
 // ===== MODIFIED SAVE SYSTEM - ALL PROGRESS SAVED LOCALLY =====
 
@@ -10611,20 +10658,6 @@ function overrideShareFunctions() {
   });
 }
 
-// ===== AUTO LOGOUT ON PAGE RELOAD =====
-
-// Clear current user session on page load (but keep localStorage data)
-window.addEventListener('beforeunload', function() {
-  // Don't clear localStorage, just the current session
-  console.log('🔄 Page reloading - Login screen will show again');
-});
-
-// Force login screen on every page visit
-window.addEventListener('load', function() {
-  console.log('🔄 Page loaded - Showing login screen');
-  // Login screen is already set to display: flex in DOMContentLoaded
-});
-
 // ===== INITIALIZATION =====
 
 // Initialize overrides when DOM is loaded
@@ -10653,8 +10686,9 @@ function generate10DigitId() {
   return randomId.toString();
 }
 
-// Initialize game with user data
+// Initialize game with user data - RESTORE ALL EXISTING DATA
 function initializeGameWithUser(user) {
+  // ✅ အရင် local ACC data ကိုပဲပြန်ရမယ် - အသစ်မဖြစ်ရ
   tokens = user.tokens || 0;
   coins = user.coins || 0;
   crystals = user.crystals || 0;
@@ -10666,7 +10700,7 @@ function initializeGameWithUser(user) {
   share10Count = user.share10Count || 0;
   currentUserFrame = user.frameId || 'default';
 
-  // Update UI
+  // Update UI with restored data
   tokenCountElem.textContent = tokens;
   coinCountElem.textContent = coins;
   
@@ -10676,21 +10710,22 @@ function initializeGameWithUser(user) {
     crystalCountElem.textContent = crystals;
   }
 
-  // Update task states
+  // Update task states with restored data
   updateTaskStates();
 
   // Start timer for 3-hour task
   updateTaskTimer();
   
-  // Save initial state to localStorage
+  // Save current state to localStorage (to confirm restoration)
   saveUserData();
   
-  console.log('🎮 Game initialized - All features enabled except Edit Profile and Share');
+  console.log('🎮 Game initialized - All previous data restored successfully');
+  console.log('📊 Restored Data - Tokens:', tokens, 'Coins:', coins, 'Crystals:', crystals);
 }
 
 // ===== AUTO-SAVE FEATURE =====
 
-// Auto-save every 30 seconds
+// Auto-save every 30 seconds to preserve all progress
 setInterval(function() {
   if (currentUser && currentUser.isLocalAccount) {
     saveUserData();
@@ -10706,43 +10741,11 @@ window.addEventListener('beforeunload', function() {
   }
 });
 
-// ===== ENHANCED LOCAL ACCOUNT FEATURES =====
-
-// Allow frame system for local accounts
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('frame-action-btn')) {
-    if (isLocalAccount()) {
-      // ✅ ALLOWED - Frame purchase for local accounts
-      setTimeout(saveUserData, 100);
-    }
-  }
-});
-
-// Allow exchange system for local accounts  
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('exchange-item')) {
-    if (isLocalAccount()) {
-      // ✅ ALLOWED - Exchange for local accounts
-      setTimeout(saveUserData, 100);
-    }
-  }
-});
-
-// Allow battle system for local accounts
-document.addEventListener('click', function(e) {
-  if (e.target.id === 'open-token-btn') {
-    if (isLocalAccount()) {
-      // ✅ ALLOWED - Battle for local accounts
-      setTimeout(saveUserData, 100);
-    }
-  }
-});
-
-console.log('🔧 Local Account System Loaded - Login Screen Always Shows on Page Load');
+console.log('🔧 Local Account System Loaded - Existing Data Always Restored, No New Accounts Created');
     
-
-
   
+
+
 
 
   
