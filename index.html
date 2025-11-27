@@ -10321,7 +10321,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// ===== LOCAL ACCOUNT SYSTEM - COMPLETE =====
+
+     // ===== LOCAL ACCOUNT SYSTEM - COMPLETE =====
 
 // DOM Elements for Local Account
 const localAccountBtn = document.getElementById('local-account-btn');
@@ -10506,7 +10507,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 });
 
-// ===== EDIT PROFILE FIX =====
+// ===== EDIT PROFILE FIX FOR ONLINE USERS =====
 
 // ❌ STRICTLY BLOCK EDIT PROFILE ONLY FOR LOCAL - FIXED VERSION
 editProfileBtn.addEventListener('click', function() {
@@ -10515,10 +10516,8 @@ editProfileBtn.addEventListener('click', function() {
     return;
   }
   
-  // ✅ Online users - Go directly to Edit Profile, NOT back to Login Screen
+  // ✅ Online users - Go directly to Edit Profile
   accountScreen.style.display = 'none';
-  
-  // Show Edit Profile screen directly
   loginScreen.style.display = 'flex';
 
   if (currentUser) {
@@ -10533,6 +10532,7 @@ editProfileBtn.addEventListener('click', function() {
       defaultAvatar.style.display = 'block';
     }
     
+    // ✅ FIX: Change button to "Update Profile" for online users
     createAccountBtn.textContent = 'Update Profile';
     
     // Hide local button in edit profile
@@ -10835,9 +10835,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Also check on user interactions
 document.addEventListener('click', function() {
   setTimeout(manageLocalButtonVisibility, 100);
-});
-
-  
+});     
 
 
 
