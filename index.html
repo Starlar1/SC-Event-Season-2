@@ -10320,11 +10320,29 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-  // ===== LOCAL ACCOUNT SYSTEM - FOR ONLINE USERS ONLY =====
+// ===== LOCAL ACCOUNT SYSTEM - SHOW ONLY IN ACC OPEN =====
 
 // DOM Elements for Local Account
 const localAccountBtn = document.getElementById('local-account-btn');
+
+// Show/Hide Local Account button based on screen
+function manageLocalButtonVisibility() {
+  const loginScreen = document.getElementById('login-screen');
+  const accountScreen = document.getElementById('account-screen');
+  
+  // Show local button only in login screen (ACC Open Screen)
+  if (loginScreen && loginScreen.style.display === 'flex') {
+    localAccountBtn.style.display = 'block';
+  } 
+  // Hide local button in account screen (Edit Profile)
+  else if (accountScreen && accountScreen.style.display === 'flex') {
+    localAccountBtn.style.display = 'none';
+  }
+  // Hide in all other cases
+  else {
+    localAccountBtn.style.display = 'none';
+  }
+}
 
 // Local Account Button Click Event
 localAccountBtn.addEventListener('click', function() {
@@ -10428,12 +10446,15 @@ function createLocalAccount() {
   }
 }
 
-// ===== MODIFIED USER LOADING - HIDE LOGIN SCREEN FOR ONLINE USERS =====
+// ===== MODIFIED USER LOADING - MANAGE LOCAL BUTTON VISIBILITY =====
 
-// Modified user loading - Only show login screen for new users
+// Modified user loading
 document.addEventListener('DOMContentLoaded', async function() {
   const savedUser = localStorage.getItem('currentUser');
   const userServer = localStorage.getItem('userServer');
+
+  // Initial button visibility check
+  manageLocalButtonVisibility();
 
   if (savedUser && userServer) {
     try {
@@ -10460,9 +10481,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
         
       } else {
-        // ❌ Local user - Show login screen with local option
+        // ❌ Local user - Show login screen
         console.log('Local account detected - Showing login screen');
         loginScreen.style.display = 'flex';
+        // Show local button in login screen
+        manageLocalButtonVisibility();
       }
       
     } catch (error) {
@@ -10470,17 +10493,19 @@ document.addEventListener('DOMContentLoaded', async function() {
       localStorage.removeItem('currentUser');
       localStorage.removeItem('userServer');
       loginScreen.style.display = 'flex';
+      manageLocalButtonVisibility();
     }
   } else {
     // No saved user - Show login screen
     console.log('No saved account - Showing login screen');
     loginScreen.style.display = 'flex';
+    manageLocalButtonVisibility();
   }
 });
 
-// ===== MODIFIED SAVE SYSTEM =====
+// ===== MODIFIED SAVE SYSTEM - ALL PROGRESS SAVED LOCALLY =====
 
-// Modified save function
+// Modified save function - ALL VALUES SAVE TO LOCALSTORAGE
 async function saveUserData() {
   if (currentUser) {
     // Update user data with current game state
@@ -10496,7 +10521,7 @@ async function saveUserData() {
     currentUser.frameId = currentUserFrame;
     currentUser.lastLogin = new Date().toISOString();
 
-    // Save to localStorage
+    // ✅ ALWAYS save to localStorage (ရရှိထားသော အရာများကို local မှာသိမ်း)
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     
     // Only save to Supabase if NOT a local account
@@ -10510,7 +10535,7 @@ async function saveUserData() {
   }
 }
 
-// ===== OVERRIDE EXISTING GAME FUNCTIONS =====
+// ===== OVERRIDE EXISTING GAME FUNCTIONS TO SAVE TO LOCAL =====
 
 // Override all game functions to auto-save
 function overrideGameFunctions() {
@@ -10596,6 +10621,9 @@ editProfileBtn.addEventListener('click', function() {
     }
     
     createAccountBtn.textContent = 'Update Profile';
+    
+    // Hide local button in edit profile
+    manageLocalButtonVisibility();
   }
 });
 
@@ -10618,12 +10646,29 @@ function overrideShareFunctions() {
   });
 }
 
+// ===== MANAGE LOCAL BUTTON IN ALL SCREENS =====
+
+// Override create account button to manage local button visibility
+const originalCreateAccount = createAccountBtn.onclick;
+createAccountBtn.onclick = function() {
+  if (originalCreateAccount) originalCreateAccount.call(this);
+  manageLocalButtonVisibility();
+};
+
+// Manage visibility when profile pic upload is clicked
+profilePicUpload.addEventListener('change', function() {
+  manageLocalButtonVisibility();
+});
+
 // ===== INITIALIZATION =====
 
 // Initialize overrides when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   overrideShareFunctions(); // Only block share functions for local
   overrideGameFunctions(); // Enable auto-save for all game functions
+  
+  // Initial button visibility check
+  manageLocalButtonVisibility();
 });
 
 // Generate 10-digit ID function
@@ -10634,8 +10679,9 @@ function generate10DigitId() {
   return randomId.toString();
 }
 
-// Initialize game with user data
+// Initialize game with user data - SAVE ALL PROGRESS LOCALLY
 function initializeGameWithUser(user) {
+  // ✅ ရရှိထားသော အရာများကို local မှာသိမ်း
   tokens = user.tokens || 0;
   coins = user.coins || 0;
   crystals = user.crystals || 0;
@@ -10665,11 +10711,14 @@ function initializeGameWithUser(user) {
   
   // Save current state to localStorage
   saveUserData();
+  
+  // Manage local button visibility
+  manageLocalButtonVisibility();
 }
 
 // ===== AUTO-SAVE FEATURE =====
 
-// Auto-save every 30 seconds
+// Auto-save every 30 seconds to preserve all progress
 setInterval(function() {
   if (currentUser) {
     saveUserData();
@@ -10681,7 +10730,64 @@ window.addEventListener('beforeunload', function() {
   if (currentUser) {
     saveUserData();
   }
-});      
+});
+
+// ===== MONITOR SCREEN CHANGES FOR BUTTON VISIBILITY =====
+
+// Monitor screen changes to manage local button visibility
+function monitorScreenChanges() {
+  // Monitor login screen
+  const loginObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        manageLocalButtonVisibility();
+      }
+    });
+  });
+
+  // Monitor account screen
+  const accountObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        manageLocalButtonVisibility();
+      }
+    });
+  });
+
+  // Start observing
+  const loginScreen = document.getElementById('login-screen');
+  const accountScreen = document.getElementById('account-screen');
+  
+  if (loginScreen) {
+    loginObserver.observe(loginScreen, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+  
+  if (accountScreen) {
+    accountObserver.observe(accountScreen, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+}
+
+// Initialize screen monitoring
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(monitorScreenChanges, 1000);
+});
+
+// Also check on user interactions
+document.addEventListener('click', function() {
+  setTimeout(manageLocalButtonVisibility, 100);
+});
+
+console.log('🔧 Local Account System Loaded - Local Button Shows Only in ACC Open Screen');
+    
+    
+      
+
 
 
 
