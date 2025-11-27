@@ -10320,9 +10320,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-
-
-     // ===== LOCAL ACCOUNT SYSTEM - COMPLETE =====
+// ===== LOCAL ACCOUNT SYSTEM - COMPLETE =====
 
 // DOM Elements for Local Account
 const localAccountBtn = document.getElementById('local-account-btn');
@@ -10351,7 +10349,7 @@ localAccountBtn.addEventListener('click', function() {
   const savedUser = localStorage.getItem('currentUser');
   
   if (savedUser) {
-    // Load existing local account - အရင် Data all ပြန်ရမယ်
+    // Load existing local account
     try {
       currentUser = JSON.parse(savedUser);
       
@@ -10507,205 +10505,26 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 });
 
-// ===== EDIT PROFILE FIX FOR ONLINE USERS =====
-
-// ❌ STRICTLY BLOCK EDIT PROFILE ONLY FOR LOCAL - FIXED VERSION
-editProfileBtn.addEventListener('click', function() {
-  if (isLocalAccount()) {
-    alert('❌ Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။');
-    return;
-  }
-  
-  // ✅ Online users - Go directly to Edit Profile
-  accountScreen.style.display = 'none';
-  loginScreen.style.display = 'flex';
-
-  if (currentUser) {
-    userNameInput.value = currentUser.displayName;
-
-    if (currentUser.photoURL) {
-      profilePicPreview.src = currentUser.photoURL;
-      profilePicPreview.style.display = 'block';
-      defaultAvatar.style.display = 'none';
-    } else {
-      profilePicPreview.style.display = 'none';
-      defaultAvatar.style.display = 'block';
-    }
-    
-    // ✅ FIX: Change button to "Update Profile" for online users
-    createAccountBtn.textContent = 'Update Profile';
-    
-    // Hide local button in edit profile
-    manageLocalButtonVisibility();
-  }
-});
-
-// ===== MODIFIED CREATE ACCOUNT BUTTON FOR EDIT PROFILE =====
-
-// Modified Create Account Button for Edit Profile
-createAccountBtn.addEventListener('click', async function() {
-  const userName = userNameInput.value.trim();
-
-  if (!userName) {
-    alert('ကျေးဇူးပြု၍ နာမည်ထည့်သွင်းပါ!');
-    return;
-  }
-
-  if (userName.length < 2) {
-    alert('ကျေးဇူးပြု၍ နာမည်အနည်းဆုံး ၂ လုံးထည့်ပါ!');
-    return;
-  }
-
-  try {
-    // Check if we're in edit mode (Update Profile button)
-    if (createAccountBtn.textContent.includes('Update') && currentUser) {
-      // ✅ UPDATE existing profile - Stay in Edit Profile
-      currentUser.displayName = userName;
-      currentUser.photoURL = profilePicPreview.style.display !== 'none' ? profilePicPreview.src : null;
-
-      // Save to current Supabase server
-      await saveUserToSupabase(currentUser);
-      
-      // Save to localStorage
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      
-      // ✅ Go back to Account Screen, NOT Login Screen
-      loginScreen.style.display = 'none';
-      accountScreen.style.display = 'flex';
-      
-      // Update account screen display
-      updateAccountScreen();
-      
-      // Reset button text
-      createAccountBtn.textContent = 'အကောင့်ဖွင့်မည်';
-      
-      alert('Profile updated successfully!');
-    } else {
-      // CREATE new account - original code
-      createAccountBtn.disabled = true;
-      createAccountBtn.textContent = 'Loading... ';
-      
-      const selectedServer = await selectServerForNewUser();
-      switchSupabaseClient(selectedServer);
-      
-      const userId = generate10DigitId();
-      
-      const userData = {
-        uid: userId,
-        displayName: userName,
-        photoURL: profilePicPreview.style.display !== 'none' ? profilePicPreview.src : null,
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        tokens: 0,
-        coins: 0,
-        crystals: 0,
-        completedTasks: {
-          '3hour': false,
-          'channel1': false,
-          'channel2': false,
-          'channel3': false,
-          'channel4': false,
-          'youtube': false,
-          'share': false,
-          'moonton': false,
-          'share10': false,
-          'lily': false,
-          'maxdiamond': false,
-          'diablo': false,
-          'pot': false,
-          'starlar-studio': false
-        },
-        lastTokenTime: 0,
-        battleTry: 0,
-        lastBattleTime: Date.now(),
-        shareCount: 0,
-        share10Count: 0,
-        frameId: 'default',
-        server: selectedServer
-      };
-      
-      await saveUserToSupabase(userData);
-      userCounts[selectedServer]++;
-      localStorage.setItem('userCounts', JSON.stringify(userCounts));
-      localStorage.setItem('currentUser', JSON.stringify(userData));
-      localStorage.setItem('userServer', selectedServer);
-      currentUser = userData;
-      
-      loginScreen.style.display = 'none';
-      updateProfileCircle();
-      
-      const mainScreen = document.getElementById('main-screen');
-      if (mainScreen) {
-        mainScreen.style.display = 'block';
-      }
-      
-      alert(`အကောင့်ဖွင့်ပြီးပါပြီ! Event ကိုစတင်နိုင်ပါပြီ။\nသင့် User ID: ${userId}\nServer: ${selectedServer}`);
-    }
-  } catch (error) {
-    console.error('Error creating/updating account:', error);
-    
-    createAccountBtn.disabled = false;
-    createAccountBtn.textContent = 'အကောင့်ဖွင့်မည်';
-    
-    if (error.message.includes('full')) {
-      alert('❌ ဆာဗာများ ပြည့်သွားပါပြီ! (တစ်ဆာဗာလျှင် 100 ယောက်သာ)\nကျေးဇူးပြု၍ နောက်မှထပ်ကြိုးစားပါ။');
-    } else if (error.message.includes('No servers available')) {
-      alert('❌ ယခုအချိန်တွင် အကောင့်အသစ်ဖွင့်ခွင့် မရှိပါ။\nကျေးဇူးပြု၍ နောက်မှထပ်ကြိုးစားပါ။');
-    } else {
-      alert('အကောင့်ဖွင့်ရာတွင် အမှားတစ်ခုဖြစ်နေပါသည်။ ကျေးဇူးပြု၍ နောက်မှထပ်ကြိုးစားပါ။');
-    }
-  }
-});
-
-// ===== UPDATE ACCOUNT SCREEN FUNCTION =====
-
-function updateAccountScreen() {
-  if (currentUser) {
-    if (currentUser.photoURL) {
-      accountAvatarImg.src = currentUser.photoURL;
-      accountAvatarImg.style.display = 'block';
-      accountAvatarDefault.style.display = 'none';
-    } else {
-      accountAvatarImg.style.display = 'none';
-      accountAvatarDefault.style.display = 'block';
-    }
-
-    accountNameDisplay.textContent = currentUser.displayName;
-    accountIdDisplay.textContent = `ID: ${currentUser.uid}`;
-    
-    // Server နံပါတ်ပြသခြင်း
-    const serverDisplay = document.getElementById('account-server-display');
-    if (serverDisplay) {
-      const serverNumber = currentServer.replace('server', '');
-      serverDisplay.textContent = `Server: ${serverNumber}`;
-    }
-    
-    accountTokens.textContent = currentUser.tokens || 0;
-    accountCoins.textContent = currentUser.coins || 0;
-  }
-}
-
-// ===== CLOSE ACCOUNT SCREEN BUTTON =====
-
-closeAccountBtn.addEventListener('click', function() {
-  accountScreen.style.display = 'none';
-  // Go back to main screen, NOT login screen
-  const mainScreen = document.getElementById('main-screen');
-  if (mainScreen) {
-    mainScreen.style.display = 'block';
-  }
-});
-
-// ===== STRICT RESTRICTIONS - ONLY EDIT PROFILE AND SHARE BLOCKED FOR LOCAL =====
+// ===== STRICT RESTRICTIONS - EDIT PROFILE AND SHARE BLOCKED FOR LOCAL =====
 
 // Function to check if current user is local account
 function isLocalAccount() {
   return currentUser && currentUser.isLocalAccount === true;
 }
 
-// ❌ STRICTLY BLOCK SHARE FUNCTIONS ONLY FOR LOCAL
+// ❌ STRICTLY BLOCK EDIT PROFILE FOR LOCAL ACCOUNTS
+editProfileBtn.addEventListener('click', function() {
+  if (isLocalAccount()) {
+    alert('❌ Local Account များသည် Profile Edit လုပ်ခွင့်မရှိပါ။');
+    return;
+  }
+  
+  // ✅ Online users - Proceed to Edit Profile
+  // (Edit profile logic for online users goes here)
+});
+
+// ❌ STRICTLY BLOCK SHARE FUNCTIONS FOR LOCAL ACCOUNTS
 function overrideShareFunctions() {
-  // Override Telegram Share - BLOCKED FOR LOCAL
   const shareButtons = ['btn-share', 'btn-share10'];
   shareButtons.forEach(btnId => {
     const btn = document.getElementById(btnId);
@@ -10722,25 +10541,50 @@ function overrideShareFunctions() {
   });
 }
 
-// ===== MANAGE LOCAL BUTTON IN ALL SCREENS =====
+// ===== ACCOUNT SCREEN MANAGEMENT =====
 
-// Override create account button to manage local button visibility
-const originalCreateAccount = createAccountBtn.onclick;
-createAccountBtn.onclick = function() {
-  if (originalCreateAccount) originalCreateAccount.call(this);
-  manageLocalButtonVisibility();
-};
-
-// Manage visibility when profile pic upload is clicked
-profilePicUpload.addEventListener('change', function() {
-  manageLocalButtonVisibility();
+// Close Account Screen Button
+closeAccountBtn.addEventListener('click', function() {
+  accountScreen.style.display = 'none';
+  // Go back to main screen
+  const mainScreen = document.getElementById('main-screen');
+  if (mainScreen) {
+    mainScreen.style.display = 'block';
+  }
 });
+
+// Update Account Screen Display
+function updateAccountScreen() {
+  if (currentUser) {
+    if (currentUser.photoURL) {
+      accountAvatarImg.src = currentUser.photoURL;
+      accountAvatarImg.style.display = 'block';
+      accountAvatarDefault.style.display = 'none';
+    } else {
+      accountAvatarImg.style.display = 'none';
+      accountAvatarDefault.style.display = 'block';
+    }
+
+    accountNameDisplay.textContent = currentUser.displayName;
+    accountIdDisplay.textContent = `ID: ${currentUser.uid}`;
+    
+    // Server display
+    const serverDisplay = document.getElementById('account-server-display');
+    if (serverDisplay) {
+      const serverNumber = currentServer.replace('server', '');
+      serverDisplay.textContent = `Server: ${serverNumber}`;
+    }
+    
+    accountTokens.textContent = currentUser.tokens || 0;
+    accountCoins.textContent = currentUser.coins || 0;
+  }
+}
 
 // ===== INITIALIZATION =====
 
 // Initialize overrides when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  overrideShareFunctions(); // Only block share functions for local
+  overrideShareFunctions(); // Block share functions for local accounts
   manageLocalButtonVisibility();
 });
 
@@ -10786,11 +10630,10 @@ function initializeGameWithUser(user) {
   manageLocalButtonVisibility();
 }
 
-// ===== MONITOR SCREEN CHANGES FOR BUTTON VISIBILITY =====
+// ===== SCREEN CHANGE MONITORING =====
 
 // Monitor screen changes to manage local button visibility
 function monitorScreenChanges() {
-  // Monitor login screen
   const loginObserver = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
@@ -10799,7 +10642,6 @@ function monitorScreenChanges() {
     });
   });
 
-  // Monitor account screen
   const accountObserver = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
@@ -10808,7 +10650,6 @@ function monitorScreenChanges() {
     });
   });
 
-  // Start observing
   const loginScreen = document.getElementById('login-screen');
   const accountScreen = document.getElementById('account-screen');
   
@@ -10832,10 +10673,12 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(monitorScreenChanges, 1000);
 });
 
-// Also check on user interactions
+// Check on user interactions
 document.addEventListener('click', function() {
   setTimeout(manageLocalButtonVisibility, 100);
-});     
+});
+
+
 
 
 
