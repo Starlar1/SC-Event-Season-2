@@ -12113,11 +12113,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(style);
 });
 
-// ===== CREATE AND ADD INVITATION SCREEN =====
+
+    // ===== FULL JAVASCRIPT FOR INVITATION SYSTEM =====
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎮 Creating invitation system...');
+  console.log('🎮 Starting invitation system...');
   
-  // Create invitation screen HTML
+  // ===== CREATE INVITATION SCREEN =====
   const invitationHTML = `
     <div id="invitation-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #0a1a5c, #1a3acd, #2a5aff); background-size: 400% 400%; z-index: 2000; overflow-y: auto; color: white; padding: 15px;">
       
@@ -12170,8 +12171,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Add to body
   document.body.insertAdjacentHTML('beforeend', invitationHTML);
+  console.log('✅ Invitation screen created');
   
-  // ===== SETUP EVENT 4 CLICK HANDLER =====
+  // ===== SETUP EVENT 4 CLICK =====
   function setupEvent4Click() {
     const eventsScreen = document.getElementById('events-screen');
     if (!eventsScreen) {
@@ -12181,6 +12183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     setTimeout(() => {
       const eventImages = eventsScreen.querySelectorAll('img');
+      console.log(`Found ${eventImages.length} images`);
       
       if (eventImages.length >= 4) {
         const fourthImage = eventImages[3];
@@ -12191,7 +12194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fourthImage.removeEventListener('click', handleEvent4Click);
         fourthImage.addEventListener('click', handleEvent4Click);
         
-        console.log('✅ Event 4 click handler ready');
+        console.log('✅ Event 4 click ready');
       }
     }, 500);
   }
@@ -12209,9 +12212,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   setTimeout(setupEvent4Click, 1000);
   
-  // ===== INVITATION SYSTEM FUNCTIONS =====
+  // ===== INVITATION SYSTEM =====
   function initInvitationSystem() {
-    console.log('🎁 Initializing invitation system...');
+    console.log('🎁 Initializing invitation system');
     
     const userCodeDisplay = document.getElementById('user-code');
     const shareBtn = document.getElementById('share-code-btn');
@@ -12221,7 +12224,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultDiv = document.getElementById('code-result');
     const backBtn = document.getElementById('back-invitation');
     
-    // Load state
+    // State
     let invitationState = JSON.parse(localStorage.getItem('invitationState')) || {
       usedFriendCode: false,
       usedCodes: JSON.parse(localStorage.getItem('usedInviteCodes')) || []
@@ -12240,13 +12243,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         
-        // Get current user
+        // Get user
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) {
-          return 'NOT-LOGGED-IN';
-        }
+        if (userError || !user) return 'NOT-LOGGED-IN';
         
-        // Get user's invite_code
+        // Get invite code
         const { data: userData, error } = await supabase
           .from('users')
           .select('invite_code')
@@ -12255,11 +12256,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!error && userData && userData.invite_code) {
           return userData.invite_code;
-        } else {
-          return 'NO-CODE-YET';
         }
+        return 'NO-CODE-YET';
       } catch (error) {
-        console.error('Get invite code error:', error);
+        console.error('Get code error:', error);
         return 'ERROR';
       }
     }
@@ -12273,33 +12273,31 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(initialize, 2000);
         return;
       } else if (userCode === 'NOT-LOGGED-IN') {
-        userCodeDisplay.textContent = 'Login Required';
+        userCodeDisplay.textContent = 'Please Login';
         return;
       } else if (userCode === 'NO-CODE-YET') {
         userCodeDisplay.textContent = 'Generating...';
         setTimeout(initialize, 3000);
         return;
       } else if (userCode === 'ERROR') {
-        userCodeDisplay.textContent = 'Try Again';
+        userCodeDisplay.textContent = 'Error';
         return;
       }
       
-      // Valid code found
       userCodeDisplay.textContent = userCode;
       
-      // Hide input if already used
       if (invitationState.usedFriendCode) {
         enterCodeSection.style.display = 'none';
       }
       
-      console.log('✅ User code loaded:', userCode);
+      console.log('✅ Code loaded:', userCode);
     }
     
     // Share button
-    shareBtn.addEventListener('click', async function() {
+    shareBtn.addEventListener('click', function() {
       const userCode = userCodeDisplay.textContent;
       if (userCode.includes('Loading') || userCode.includes('Error')) {
-        showResult('Please wait for code to load', 'error');
+        showResult('Please wait', 'error');
         return;
       }
       
@@ -12313,75 +12311,72 @@ document.addEventListener('DOMContentLoaded', function() {
       const friendCode = friendCodeInput.value.trim().toUpperCase();
       const userCode = userCodeDisplay.textContent;
       
-      // Validations
+      // Validation
       if (!friendCode || friendCode.length !== 10) {
-        showResult('10လုံးပြည့်အောင်ထည့်ပါ', 'error');
+        showResult('Enter 10-digit code', 'error');
         return;
       }
       
       if (userCode.includes('Loading') || userCode.includes('Error')) {
-        showResult('Please wait for your code to load', 'error');
+        showResult('Please wait', 'error');
         return;
       }
       
       if (friendCode === userCode) {
-        showResult('မိမိ code မသုံးရ', 'error');
+        showResult('Cannot use own code', 'error');
         return;
       }
       
       if (invitationState.usedFriendCode) {
-        showResult('တစ်ခါသာကူညီနိုင်', 'error');
+        showResult('One-time only', 'error');
         return;
       }
       
       if (invitationState.usedCodes.includes(friendCode)) {
-        showResult('ဤ code ကိုအသုံးပြုပြီးပါပြီ', 'error');
+        showResult('Already used this code', 'error');
         return;
       }
       
-      // Disable button
+      // Process
       submitBtn.disabled = true;
       submitBtn.textContent = 'Checking...';
       
       try {
-        // Process invitation
         const result = await processInvitation(friendCode, userCode);
         
         if (result.success) {
-          // Give coins to current user
+          // Add coins
           let currentCoins = parseInt(localStorage.getItem('coins')) || 0;
           currentCoins += 1000;
           localStorage.setItem('coins', currentCoins);
           
           // Update display
           const coinDisplay = document.getElementById('coin-count');
-          if (coinDisplay) {
-            coinDisplay.textContent = currentCoins;
-          }
+          if (coinDisplay) coinDisplay.textContent = currentCoins;
           
-          // Mark as used
+          // Save state
           invitationState.usedFriendCode = true;
           invitationState.usedCodes.push(friendCode);
           localStorage.setItem('invitationState', JSON.stringify(invitationState));
           localStorage.setItem('usedInviteCodes', JSON.stringify(invitationState.usedCodes));
           
-          // Hide section
+          // Hide input
           enterCodeSection.style.display = 'none';
           
-          showResult('အောင်မြင်ပါသည်! 1000 Coins ရရှိပါသည်', 'success');
+          showResult('Success! Got 1000 Coins', 'success');
         } else {
-          showResult(result.message || 'မှားယွင်းသော code', 'error');
+          showResult(result.message || 'Invalid code', 'error');
         }
       } catch (error) {
-        console.error('Submit error:', error);
-        showResult('အမှားတစ်ခုဖြစ်နေသည်', 'error');
+        console.error('Error:', error);
+        showResult('Error occurred', 'error');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit Code';
       }
     });
     
-    // Process invitation with Supabase
+    // Process invitation in Supabase
     async function processInvitation(friendCode, userCode) {
       try {
         const servers = ['server1', 'server2', 'server3', 'server4', 'server5', 'server6'];
@@ -12394,11 +12389,11 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
               const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
               
-              // 1. Get current user info
+              // Get current user
               const { data: { user }, error: userError } = await supabase.auth.getUser();
               if (userError || !user) continue;
               
-              // 2. Check if friend code exists and get user data
+              // Find friend by code
               const { data: friendData, error: friendError } = await supabase
                 .from('users')
                 .select('id, invite_code, my_code_used_by_others, coins')
@@ -12406,30 +12401,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 .single();
                 
               if (!friendError && friendData) {
-                console.log(`✅ Friend found: ${friendData.id}`);
+                console.log(`Found friend in ${server}`);
                 
-                // 3. Get current user's data
-                const { data: currentUserData, error: currentError } = await supabase
-                  .from('users')
-                  .select('my_code_used_by_others, coins')
-                  .eq('id', user.id)
-                  .single();
-                  
-                if (currentError) continue;
-                
-                // 4. Update friend's data
+                // Check if already used
                 let friendUsedList = friendData.my_code_used_by_others || [];
                 if (!Array.isArray(friendUsedList)) friendUsedList = [];
                 
-                // Check if already used
                 if (friendUsedList.includes(user.id)) {
-                  return { success: false, message: 'ဤ code ကိုအသုံးပြုပြီးပါပြီ' };
+                  return { success: false, message: 'Already used this code' };
                 }
                 
-                // Add to list
+                // Add current user to friend's list
                 friendUsedList.push(user.id);
                 
-                // Update friend's coins
+                // Update friend's coins (+1000)
                 const friendNewCoins = (friendData.coins || 0) + 1000;
                 const { error: updateFriendError } = await supabase
                   .from('users')
@@ -12442,35 +12427,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (updateFriendError) continue;
                 
-                // 5. Update current user's used codes list
-                let currentUsedList = currentUserData.my_code_used_by_others || [];
-                if (!Array.isArray(currentUsedList)) currentUsedList = [];
-                currentUsedList.push(friendData.id);
-                
-                const currentNewCoins = (currentUserData.coins || 0) + 1000;
-                const { error: updateCurrentError } = await supabase
-                  .from('users')
-                  .update({ 
-                    coins: currentNewCoins,
-                    my_code_used_by_others: currentUsedList,
-                    updated_at: new Date().toISOString()
-                  })
-                  .eq('id', user.id);
-                
-                if (updateCurrentError) continue;
-                
                 return { success: true };
               }
             } catch (e) {
-              console.log(`⚠️ ${server} error:`, e.message);
+              console.log(`${server} error:`, e.message);
             }
           }
         }
         
-        return { success: false, message: 'မှားယွင်းသော code' };
+        return { success: false, message: 'Invalid code' };
       } catch (e) {
         console.error('Process error:', e);
-        return { success: false, message: 'အမှားတစ်ခုဖြစ်နေသည်' };
+        return { success: false, message: 'Server error' };
       }
     }
     
@@ -12492,14 +12460,16 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 3000);
     }
     
-    // Initialize
+    // Start
     initialize();
-    
     console.log('✅ Invitation system ready');
   }
   
-  console.log('🚀 Invitation system setup complete!');
+  console.log('🚀 Invitation system setup complete');
 });
+        
+        
+                
 
   
  </script>
